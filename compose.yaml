@@ -1,0 +1,35 @@
+# Phase 2 - PostgreSQL コンテナ定義
+# 参照: DESIGN.md §0.4, PHASE2_PLAN.md ステップ1
+#
+# 使い方:
+#   1. `.env` を作成（.env.example をコピー & パスワードを書き換え）
+#   2. `podman compose up -d`
+#   3. `podman ps` で healthy を確認
+
+services:
+  db:
+    image: postgres:16
+    container_name: household_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # POSTGRES_PASSWORD は .env 経由で渡す
+      POSTGRES_DB: household
+      POSTGRES_USER: household_user
+      # ロケール（postgres:16 の Debian ベースで確実に使える C.UTF-8）
+      LANG: C.UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U household_user -d household"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  db_data:
+    name: household_db_data
