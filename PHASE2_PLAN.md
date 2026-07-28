@@ -470,9 +470,9 @@ uv run alembic upgrade head
 ```
 
 ```sql
-SELECT id, username, name, theme_preference, LEFT(password_hash, 20) FROM users;
--- 1 | alice   | ありす | light | $2b$12$ctuAMhvs/DIts...
--- 2 | hitsuji | ひつじ | light | $2b$12$tR8c0GVlzdooi...
+SELECT id, username, name, theme_preference, LEFT(password_hash, 7) FROM users;
+-- 1 | alice   | ありす | light | $2b$12$   ← bcrypt(cost=12) でハッシュ化されている
+-- 2 | hitsuji | ひつじ | light | $2b$12$
 ```
 
 ---
