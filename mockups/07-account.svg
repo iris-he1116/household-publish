@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <!-- device frame -->
+  <rect x="10" y="10" width="880" height="600" rx="12" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- top nav -->
+  <rect x="10" y="10" width="880" height="48" fill="#111827"/>
+  <text x="30" y="40" fill="#ffffff" font-size="15" font-weight="600">家計清算アプリ</text>
+  <rect x="695" y="18" width="80" height="32" rx="6" fill="#374151"/>
+  <text x="710" y="40" fill="#ffffff" font-size="12" font-weight="600">ありす ▴</text>
+
+  <!-- side nav (dimmed, background) -->
+  <rect x="10" y="58" width="180" height="552" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="30" y="90"  fill="#9ca3af">  ダッシュボード</text>
+  <text x="30" y="120" fill="#9ca3af">  支出一覧</text>
+  <text x="30" y="150" fill="#9ca3af">  月次清算</text>
+  <text x="30" y="180" fill="#9ca3af">  PayPay 取り込み</text>
+  <text x="30" y="210" fill="#9ca3af">  カテゴリ管理</text>
+
+  <!-- dimmed content behind -->
+  <rect x="215" y="70" width="665" height="530" rx="8" fill="#f9fafb" opacity="0.6"/>
+  <text x="230" y="100" fill="#9ca3af" font-size="14">（ダッシュボード）</text>
+
+  <!-- semi-transparent overlay hint (dropdown open) -->
+  <rect x="10" y="58" width="880" height="552" fill="#000000" opacity="0.05"/>
+
+  <!-- account dropdown panel -->
+  <rect x="640" y="60" width="235" height="326" rx="10" fill="#ffffff" stroke="#111827" stroke-width="1.2"/>
+  <!-- small pointer -->
+  <polygon points="730,58 745,50 760,58" fill="#ffffff" stroke="#111827" stroke-width="1.2"/>
+
+  <!-- user header -->
+  <rect x="640" y="60" width="235" height="60" rx="10" fill="#f9fafb"/>
+  <circle cx="670" cy="90" r="16" fill="#60a5fa"/>
+  <text x="670" y="95" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">あ</text>
+  <text x="695" y="86" font-size="13" font-weight="700">ありす</text>
+  <text x="695" y="103" font-size="10" fill="#6b7280">alice@example.com</text>
+
+  <line x1="640" y1="120" x2="875" y2="120" stroke="#e5e7eb"/>
+
+  <!-- menu items -->
+  <g font-size="13">
+    <rect x="640" y="122" width="235" height="36" fill="#ffffff"/>
+    <text x="660" y="145">✏️ 表示名の変更</text>
+
+    <rect x="640" y="158" width="235" height="36" fill="#ffffff"/>
+    <text x="660" y="181">🔑 パスワード変更</text>
+
+    <line x1="640" y1="196" x2="875" y2="196" stroke="#e5e7eb"/>
+
+    <!-- theme switcher (compound item) -->
+    <rect x="640" y="198" width="235" height="52" fill="#ffffff"/>
+    <text x="660" y="217" font-size="11" fill="#6b7280">テーマ</text>
+    <rect x="660" y="222" width="90" height="22" rx="4" fill="#111827"/>
+    <text x="683" y="238" fill="#ffffff" font-size="11">☀ ライト</text>
+    <rect x="755" y="222" width="90" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="782" y="238" font-size="11">🌙 ダーク</text>
+
+    <line x1="640" y1="252" x2="875" y2="252" stroke="#e5e7eb"/>
+
+    <rect x="640" y="254" width="235" height="36" fill="#ffffff"/>
+    <text x="660" y="277" fill="#dc2626">⎋ ログアウト</text>
+
+    <rect x="640" y="290" width="235" height="36" fill="#ffffff"/>
+    <text x="660" y="313" fill="#dc2626" font-size="12">🚪 全端末からログアウト</text>
+
+    <!-- session info footer -->
+    <rect x="640" y="326" width="235" height="60" rx="10" fill="#f9fafb"/>
+    <text x="660" y="345" font-size="10" fill="#6b7280">前回ログイン</text>
+    <text x="660" y="360" font-size="10" fill="#374151">2026-07-14 22:41</text>
+    <text x="660" y="378" font-size="10" fill="#16a34a">● セッション自動延長中</text>
+  </g>
+</svg>

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <!-- device frame -->
+  <rect x="10" y="10" width="880" height="700" rx="12" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- top nav -->
+  <rect x="10" y="10" width="880" height="48" fill="#111827"/>
+  <text x="30" y="40" fill="#ffffff" font-size="15" font-weight="600">家計清算アプリ</text>
+  <text x="710" y="40" fill="#d1d5db" font-size="12">ありす ▾</text>
+
+  <!-- side nav -->
+  <rect x="10" y="58" width="180" height="652" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="30" y="90" font-weight="600">▸ ダッシュボード</text>
+  <text x="30" y="120" fill="#374151">  支出一覧</text>
+  <text x="30" y="150" fill="#374151">  月次清算</text>
+  <text x="30" y="180" fill="#374151">  PayPay 取り込み</text>
+  <text x="30" y="210" fill="#374151">  カテゴリ管理</text>
+
+  <!-- page title -->
+  <text x="215" y="90" font-size="18" font-weight="700">こんばんは、ありす</text>
+  <text x="215" y="110" font-size="12" fill="#6b7280">いま何を使った？下のフォームに入れれば即記録できます</text>
+
+  <!-- QUICK INPUT FORM (top, prominent) -->
+  <rect x="215" y="125" width="665" height="115" rx="10" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+  <text x="230" y="148" font-weight="700" font-size="13">支出を記録</text>
+
+  <!-- row 1: date / amount / category -->
+  <text x="230" y="170" fill="#6b7280" font-size="11">日付</text>
+  <rect x="230" y="176" width="130" height="28" rx="4" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="240" y="194" font-size="12">2026-07-15</text>
+
+  <text x="370" y="170" fill="#6b7280" font-size="11">金額（円）</text>
+  <rect x="370" y="176" width="130" height="28" rx="4" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="380" y="194" font-size="12" fill="#9ca3af">¥ 0</text>
+
+  <text x="510" y="170" fill="#6b7280" font-size="11">カテゴリ</text>
+  <rect x="510" y="176" width="130" height="28" rx="4" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="520" y="194" font-size="12" fill="#9ca3af">選択 ▾</text>
+
+  <text x="650" y="170" fill="#6b7280" font-size="11">メモ（任意）</text>
+  <rect x="650" y="176" width="215" height="28" rx="4" fill="#f9fafb" stroke="#d1d5db"/>
+
+  <!-- row 2: payment method / payer / save -->
+  <text x="230" y="220" fill="#6b7280" font-size="11">支払い手段</text>
+  <rect x="290" y="209" width="52" height="22" rx="4" fill="#111827"/>
+  <text x="303" y="224" fill="#ffffff" font-size="11">現金</text>
+  <rect x="347" y="209" width="52" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="360" y="224" font-size="11">クレカ</text>
+  <rect x="404" y="209" width="60" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="415" y="224" font-size="11">PayPay</text>
+  <rect x="469" y="209" width="74" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="479" y="224" font-size="11">WeChat Pay</text>
+
+  <text x="565" y="220" fill="#6b7280" font-size="11">支払者</text>
+  <rect x="605" y="209" width="55" height="22" rx="4" fill="#111827"/>
+  <text x="618" y="224" fill="#ffffff" font-size="11">ありす</text>
+  <rect x="665" y="209" width="55" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="676" y="224" font-size="11">ひつじ</text>
+
+  <rect x="775" y="205" width="90" height="30" rx="6" fill="#111827"/>
+  <text x="805" y="225" fill="#ffffff" font-size="12" font-weight="600">記録</text>
+
+  <!-- KPI cards row -->
+  <g>
+    <rect x="215" y="255" width="200" height="85" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+    <text x="230" y="278" fill="#6b7280" font-size="11">今月（2026-07）の共有支出</text>
+    <text x="230" y="315" font-size="21" font-weight="700">¥ 128,340</text>
+
+    <rect x="425" y="255" width="200" height="85" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+    <text x="440" y="278" fill="#6b7280" font-size="11">ありすの立替額</text>
+    <text x="440" y="315" font-size="21" font-weight="700">¥ 74,200</text>
+
+    <rect x="635" y="255" width="245" height="85" rx="8" fill="#ecfeff" stroke="#67e8f9"/>
+    <text x="650" y="278" fill="#0e7490" font-size="11">現在の未清算差額（ひつじ → ありす）</text>
+    <text x="650" y="315" font-size="21" font-weight="700" fill="#0e7490">¥ 10,030</text>
+  </g>
+
+  <!-- chart card -->
+  <rect x="215" y="355" width="415" height="215" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="230" y="380" font-weight="600">カテゴリ別支出（今月）</text>
+  <rect x="240" y="405" width="240" height="18" fill="#60a5fa"/><text x="490" y="419">食費 ¥52,300</text>
+  <rect x="240" y="431" width="150" height="18" fill="#34d399"/><text x="400" y="445">日用品 ¥28,900</text>
+  <rect x="240" y="457" width="120" height="18" fill="#fbbf24"/><text x="370" y="471">娯楽 ¥21,000</text>
+  <rect x="240" y="483" width="90"  height="18" fill="#f87171"/><text x="340" y="497">外食 ¥15,600</text>
+  <rect x="240" y="509" width="60"  height="18" fill="#a78bfa"/><text x="310" y="523">その他 ¥10,540</text>
+
+  <!-- payment method card -->
+  <rect x="640" y="355" width="240" height="215" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="655" y="380" font-weight="600">支払い手段の内訳</text>
+  <text x="655" y="410">現金        ¥ 32,400</text>
+  <text x="655" y="435">クレカ       ¥ 48,900</text>
+  <text x="655" y="460">PayPay      ¥ 39,240</text>
+  <text x="655" y="485">WeChat Pay ¥  7,800</text>
+  <rect x="655" y="500" width="210" height="55" rx="6" fill="#f3f4f6" stroke="#e5e7eb"/>
+  <text x="665" y="520" font-size="11" fill="#6b7280">最終更新: 2 分前</text>
+  <text x="665" y="540" font-size="11" fill="#6b7280">未取込 PayPay 行: 12（要判定）</text>
+
+  <!-- recent expenses -->
+  <rect x="215" y="585" width="665" height="115" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="230" y="608" font-weight="600">最近の支出</text>
+  <line x1="230" y1="617" x2="865" y2="617" stroke="#e5e7eb"/>
+  <text x="230" y="637">07/14  食費   スーパー  ¥3,240  現金    by ありす</text>
+  <text x="230" y="657">07/14  外食   カフェ    ¥1,800  PayPay  by ひつじ</text>
+  <text x="230" y="677">07/13  日用品 ドラッグ  ¥2,100  クレカ  by ありす</text>
+  <text x="230" y="697">07/13  娯楽   映画      ¥3,600  クレカ  by ありす</text>
+</svg>

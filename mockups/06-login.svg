@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <!-- background -->
+  <rect width="900" height="620" fill="#f3f4f6"/>
+  <rect x="10" y="10" width="880" height="600" rx="12" fill="#f3f4f6" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- centered login card -->
+  <rect x="260" y="140" width="380" height="360" rx="12" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+
+  <!-- app title -->
+  <text x="450" y="185" font-size="20" font-weight="700" text-anchor="middle">家計清算アプリ</text>
+  <text x="450" y="208" font-size="12" fill="#6b7280" text-anchor="middle">ようこそ、ログインしてください</text>
+
+  <!-- separator -->
+  <line x1="290" y1="230" x2="610" y2="230" stroke="#e5e7eb"/>
+
+  <!-- username field -->
+  <text x="290" y="260" font-size="11" fill="#374151" font-weight="600">ユーザー名</text>
+  <rect x="290" y="268" width="320" height="34" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="302" y="290" font-size="13" fill="#9ca3af">alice</text>
+
+  <!-- password field -->
+  <text x="290" y="330" font-size="11" fill="#374151" font-weight="600">パスワード</text>
+  <rect x="290" y="338" width="320" height="34" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="302" y="360" font-size="13" fill="#9ca3af">••••••••</text>
+  <text x="587" y="360" font-size="14" fill="#9ca3af">👁</text>
+
+  <!-- remember me checkbox -->
+  <rect x="290" y="392" width="14" height="14" rx="3" fill="#111827"/>
+  <text x="294" y="403" font-size="11" fill="#ffffff">✓</text>
+  <text x="312" y="404" font-size="12" fill="#374151">ログイン状態を維持（使い続ける限り自動延長）</text>
+
+  <!-- login button -->
+  <rect x="290" y="425" width="320" height="40" rx="6" fill="#111827"/>
+  <text x="450" y="450" fill="#ffffff" font-size="14" font-weight="600" text-anchor="middle">ログイン</text>
+
+  <!-- footer note -->
+  <text x="450" y="490" font-size="11" fill="#6b7280" text-anchor="middle">アカウントは事前に作成済み（新規登録なし）</text>
+
+  <!-- outside footer -->
+  <text x="450" y="560" font-size="10" fill="#9ca3af" text-anchor="middle">© 2026 家計清算アプリ  ／  ありす &amp; ひつじ 専用</text>
+</svg>

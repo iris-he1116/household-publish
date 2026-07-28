@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <rect x="10" y="10" width="880" height="600" rx="12" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- top nav -->
+  <rect x="10" y="10" width="880" height="48" fill="#111827"/>
+  <text x="30" y="40" fill="#ffffff" font-size="15" font-weight="600">家計清算アプリ</text>
+  <text x="700" y="40" fill="#d1d5db" font-size="12">ありす ▾</text>
+
+  <!-- side nav -->
+  <rect x="10" y="58" width="180" height="552" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="30" y="90" fill="#374151">  ダッシュボード</text>
+  <text x="30" y="120" fill="#374151">  支出一覧</text>
+  <text x="30" y="150" fill="#374151">  月次清算</text>
+  <text x="30" y="180" font-weight="600">▸ PayPay 取り込み</text>
+  <text x="30" y="210" fill="#374151">  カテゴリ管理</text>
+
+  <!-- page title -->
+  <text x="215" y="90" font-size="18" font-weight="700">PayPay 取り込み</text>
+  <text x="215" y="110" font-size="12" fill="#6b7280">自分の PayPay 履歴 CSV をアップロードして、共有分をピックアップします</text>
+
+  <!-- upload area -->
+  <rect x="215" y="125" width="665" height="90" rx="8" fill="#f9fafb" stroke="#d1d5db" stroke-dasharray="6 4"/>
+  <text x="470" y="160" font-size="14" fill="#374151">📁  CSV をここにドラッグ &amp; ドロップ</text>
+  <text x="490" y="180" font-size="12" fill="#6b7280">または</text>
+  <rect x="440" y="188" width="130" height="26" rx="6" fill="#111827"/>
+  <text x="465" y="206" fill="#ffffff" font-size="12" font-weight="600">ファイルを選択</text>
+
+  <!-- import summary -->
+  <rect x="215" y="230" width="665" height="46" rx="8" fill="#ecfeff" stroke="#67e8f9"/>
+  <text x="230" y="257" font-size="12" fill="#0e7490">
+    直近アップロード: 2026-07-15 09:45 — 全 45 行  /  新規 12 行  /  重複 33 行（自動除外）
+  </text>
+
+  <!-- table header -->
+  <text x="215" y="298" font-weight="600">未判定の行（12件）</text>
+  <text x="820" y="298" font-size="11" fill="#2563eb">全て共有</text>
+  <text x="865" y="298" font-size="11" fill="#2563eb">|</text>
+
+  <rect x="215" y="308" width="665" height="30" fill="#f3f4f6"/>
+  <text x="228" y="328" font-size="11" fill="#6b7280">共有?</text>
+  <text x="280" y="328" font-size="11" fill="#6b7280">日付</text>
+  <text x="345" y="328" font-size="11" fill="#6b7280">店舗</text>
+  <text x="530" y="328" font-size="11" fill="#6b7280">金額</text>
+  <text x="610" y="328" font-size="11" fill="#6b7280">カテゴリ（後付け）</text>
+  <text x="820" y="328" font-size="11" fill="#6b7280">除外</text>
+
+  <!-- rows -->
+  <g font-size="12">
+    <line x1="215" y1="357" x2="880" y2="357" stroke="#e5e7eb"/>
+    <rect x="230" y="345" width="14" height="14" rx="3" fill="#111827"/>
+    <text x="234" y="356" font-size="11" fill="#ffffff">✓</text>
+    <text x="280" y="355">07/14</text><text x="345" y="355">ローソン 渋谷店</text>
+    <text x="530" y="355">¥ 1,820</text>
+    <rect x="605" y="342" width="150" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="615" y="358" font-size="11" fill="#6b7280">日用品 ▾</text>
+    <text x="820" y="355" fill="#dc2626">個人</text>
+
+    <line x1="215" y1="382" x2="880" y2="382" stroke="#e5e7eb"/>
+    <rect x="230" y="370" width="14" height="14" rx="3" fill="#111827"/>
+    <text x="234" y="381" font-size="11" fill="#ffffff">✓</text>
+    <text x="280" y="380">07/13</text><text x="345" y="380">スターバックス 恵比寿</text>
+    <text x="530" y="380">¥ 980</text>
+    <rect x="605" y="367" width="150" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="615" y="383" font-size="11" fill="#6b7280">外食 ▾</text>
+    <text x="820" y="380" fill="#dc2626">個人</text>
+
+    <line x1="215" y1="407" x2="880" y2="407" stroke="#e5e7eb"/>
+    <rect x="230" y="395" width="14" height="14" rx="3" fill="#ffffff" stroke="#9ca3af"/>
+    <text x="280" y="405">07/13</text><text x="345" y="405">セブンイレブン 中目黒</text>
+    <text x="530" y="405">¥ 340</text>
+    <rect x="605" y="392" width="150" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="615" y="408" font-size="11" fill="#9ca3af">カテゴリ選択 ▾</text>
+    <text x="820" y="405" fill="#dc2626">個人</text>
+
+    <line x1="215" y1="432" x2="880" y2="432" stroke="#e5e7eb"/>
+    <rect x="230" y="420" width="14" height="14" rx="3" fill="#111827"/>
+    <text x="234" y="431" font-size="11" fill="#ffffff">✓</text>
+    <text x="280" y="430">07/12</text><text x="345" y="430">Amazon.co.jp</text>
+    <text x="530" y="430">¥ 4,280</text>
+    <rect x="605" y="417" width="150" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="615" y="433" font-size="11" fill="#6b7280">日用品 ▾</text>
+    <text x="820" y="430" fill="#dc2626">個人</text>
+
+    <line x1="215" y1="457" x2="880" y2="457" stroke="#e5e7eb"/>
+    <rect x="230" y="445" width="14" height="14" rx="3" fill="#ffffff" stroke="#9ca3af"/>
+    <text x="280" y="455">07/12</text><text x="345" y="455">TOHO シネマズ</text>
+    <text x="530" y="455">¥ 2,000</text>
+    <rect x="605" y="442" width="150" height="22" rx="4" fill="#ffffff" stroke="#d1d5db"/>
+    <text x="615" y="458" font-size="11" fill="#9ca3af">カテゴリ選択 ▾</text>
+    <text x="820" y="455" fill="#dc2626">個人</text>
+
+    <text x="280" y="490" font-size="11" fill="#6b7280">… 他 7 件</text>
+  </g>
+
+  <!-- action bar -->
+  <rect x="215" y="555" width="665" height="45" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="235" y="582" font-size="12" fill="#374151">選択中: <tspan font-weight="700">3 件</tspan> を共有支出として登録</text>
+  <rect x="640" y="562" width="110" height="30" rx="6" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="660" y="582" font-size="12">個人として保存</text>
+  <rect x="760" y="562" width="110" height="30" rx="6" fill="#111827"/>
+  <text x="775" y="582" fill="#ffffff" font-size="12" font-weight="600">共有として保存</text>
+</svg>

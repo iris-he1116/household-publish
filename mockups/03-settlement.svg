@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <rect x="10" y="10" width="880" height="600" rx="12" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- top nav -->
+  <rect x="10" y="10" width="880" height="48" fill="#111827"/>
+  <text x="30" y="40" fill="#ffffff" font-size="15" font-weight="600">家計清算アプリ</text>
+  <text x="700" y="40" fill="#d1d5db" font-size="12">ありす ▾</text>
+
+  <!-- side nav -->
+  <rect x="10" y="58" width="180" height="552" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="30" y="90" fill="#374151">  ダッシュボード</text>
+  <text x="30" y="120" fill="#374151">  支出一覧</text>
+  <text x="30" y="150" font-weight="600">▸ 月次清算</text>
+  <text x="30" y="180" fill="#374151">  PayPay 取り込み</text>
+  <text x="30" y="210" fill="#374151">  カテゴリ管理</text>
+
+  <!-- page title with month selector -->
+  <text x="215" y="90" font-size="18" font-weight="700">月次清算</text>
+  <rect x="330" y="72" width="120" height="26" rx="6" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="345" y="90" font-size="12">◂ 2026-06 ▸</text>
+  <!-- status pill -->
+  <rect x="470" y="72" width="110" height="26" rx="13" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="485" y="90" font-size="12" fill="#92400e">締め済み・要確認</text>
+
+  <!-- summary panel -->
+  <rect x="215" y="115" width="665" height="130" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="235" y="140" font-weight="600">2026-06 の集計</text>
+
+  <text x="235" y="170" fill="#6b7280" font-size="11">共有支出合計</text>
+  <text x="235" y="192" font-size="18" font-weight="700">¥ 214,600</text>
+
+  <text x="360" y="170" fill="#6b7280" font-size="11">ありす 立替</text>
+  <text x="360" y="192" font-size="18" font-weight="700">¥ 132,800</text>
+
+  <text x="490" y="170" fill="#6b7280" font-size="11">ひつじ立替</text>
+  <text x="490" y="192" font-size="18" font-weight="700">¥ 81,800</text>
+
+  <text x="640" y="170" fill="#6b7280" font-size="11">1人あたり</text>
+  <text x="640" y="192" font-size="18" font-weight="700">¥ 107,300</text>
+
+  <!-- transfer instruction -->
+  <rect x="235" y="207" width="625" height="28" rx="6" fill="#ecfeff" stroke="#67e8f9"/>
+  <text x="250" y="226" font-size="13" fill="#0e7490">➡ 精算：ひつじ → ありす に  <tspan font-weight="700">¥ 25,500</tspan>  を送金してください</text>
+
+  <!-- confirmation panel -->
+  <rect x="215" y="260" width="665" height="130" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="235" y="285" font-weight="600">双方の確認</text>
+
+  <!-- ありす -->
+  <rect x="235" y="300" width="290" height="70" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="255" y="325" font-weight="600">ありす</text>
+  <text x="255" y="345" font-size="11" fill="#166534">✓ 確認済み（07/01 09:12）</text>
+
+  <!-- Partner -->
+  <rect x="540" y="300" width="325" height="70" rx="6" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="560" y="325" font-weight="600">ひつじ</text>
+  <text x="560" y="345" font-size="11" fill="#6b7280">未確認</text>
+  <rect x="740" y="325" width="120" height="30" rx="6" fill="#111827"/>
+  <text x="760" y="345" fill="#ffffff" font-size="12" font-weight="600">確認する</text>
+
+  <!-- category breakdown -->
+  <rect x="215" y="405" width="425" height="195" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="235" y="430" font-weight="600">カテゴリ別内訳</text>
+  <rect x="245" y="450" width="330" height="18" fill="#60a5fa"/><text x="580" y="464" font-size="11">食費 ¥89,200</text>
+  <rect x="245" y="475" width="220" height="18" fill="#34d399"/><text x="475" y="489" font-size="11">日用品 ¥52,400</text>
+  <rect x="245" y="500" width="150" height="18" fill="#fbbf24"/><text x="405" y="514" font-size="11">娯楽 ¥38,000</text>
+  <rect x="245" y="525" width="100" height="18" fill="#f87171"/><text x="355" y="539" font-size="11">外食 ¥25,000</text>
+  <rect x="245" y="550" width="50" height="18" fill="#a78bfa"/><text x="305" y="564" font-size="11">その他 ¥10,000</text>
+
+  <!-- payer breakdown -->
+  <rect x="650" y="405" width="230" height="195" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="670" y="430" font-weight="600">支払い手段</text>
+  <text x="670" y="460" font-size="12">現金        ¥ 45,400</text>
+  <text x="670" y="485" font-size="12">クレカ       ¥ 92,300</text>
+  <text x="670" y="510" font-size="12">PayPay      ¥ 62,700</text>
+  <text x="670" y="535" font-size="12">WeChat Pay ¥ 14,200</text>
+  <line x1="670" y1="550" x2="860" y2="550" stroke="#e5e7eb"/>
+  <text x="670" y="575" font-size="11" fill="#6b7280">支出件数: 42 件</text>
+</svg>
