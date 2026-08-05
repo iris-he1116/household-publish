@@ -9,6 +9,13 @@ DESIGN.md §2.6 の流れ:
 CSV フォーマット（PayPay の履歴 CSV を想定）:
 - 現在は「取引日, 金額, 店舗名, 取引ID」の4列を最小構成とする。
 - 実 PayPay CSV のカラム名に合わせた変換は、必要になったら Pandas 等で拡張する。
+
+## トランザクション境界（expense.py の規約と同じ）
+
+`adopt()` は「Expense 作成」「staging を adopted に」「events 追記」の3つを
+**1つのまとまり**として扱う。途中で失敗したら全部なかったことにする必要があるため、
+`expense_svc.create_expense_core()`（commit しない版）を使い、
+commit はこの関数の末尾で1回だけ行う。
 """
 import csv
 import io
@@ -89,7 +96,11 @@ def adopt(
         raise ValueError("他人のステージング行は判定できません")
 
     # Expense を作成（source_staging_id を紐付ける）
-    expense = expense_svc.create_expense(
+    # ★ create_expense_core を使う（commit しない版）。
+    #   commit してしまうと、この後の staging 更新や events 追記が失敗したときに
+    #   「支出だけ登録されて staging は pending のまま」の不整合が残る。
+    #   → 再度 adopt すると同じ取引が二重計上される。
+    expense = expense_svc.create_expense_core(
         session, user,
         amount=staging.amount,
         occurred_on=staging.occurred_on,
