@@ -28,7 +28,7 @@
 | Phase 2 | DB 基盤（PostgreSQL コンテナ / SQLAlchemy モデル / Alembic） | 完了 |
 | Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了 |
 | Phase 4 | フロントエンド（Next.js） | **次はここ** |
-| Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト | 未着手 |
+| Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 一部着手（テスト基盤のみ） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
 | Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
 
@@ -106,6 +106,38 @@ uv run uvicorn app.main:app --reload
 
 Swagger UI から全 API を試せる。認証は Phase 5 実装予定のため、Phase 3 時点では
 リクエストヘッダ `X-User-Id`（`1` = ありす／`2` = ひつじ／省略時は `1`）でユーザーを切り替える。
+
+---
+
+## 開発用サンプルデータ
+
+画面や API を試すとき、見栄えのするデータを入れられる。
+
+```bash
+cd backend
+uv run python scripts/seed_dev_data.py           # 既存データを消して投入
+uv run python scripts/seed_dev_data.py --keep    # 消さずに追加
+```
+
+投入されるもの：カテゴリ5件、2026-06（`settled`）／2026-07（`closed`）／2026-08（`in_progress`）の
+支出39件、PayPay ステージング5件。清算の3状態が揃うので月次清算画面の各状態を確認できる。
+
+---
+
+## テスト
+
+```bash
+cd backend
+uv sync --extra dev          # 初回のみ（pytest 等を入れる）
+uv run pytest                # 全テスト
+uv run pytest tests/unit/    # 純関数のみ（DB 不要・高速）
+uv run pytest -v             # 各テスト名を表示
+```
+
+- **`tests/unit/`** — DB を触らない純関数のテスト。コンテナが停止していても走る
+- **`tests/integration/`** — DB に接続するテスト。`household_test` という**別 DB** を自動作成して使うため、開発用データ（`household`）は汚れない
+
+テスト用 DB を作り直したいときは `DROP DATABASE household_test;` すれば次回の実行で再作成される。
 
 ---
 
