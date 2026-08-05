@@ -45,25 +45,37 @@ class TestSplitEqually:
         assert per_person == 0
         assert transfer == 0
 
-    def test_合計が奇数のとき端数は切り捨てられる(self):
-        """現在の実装の挙動を記録するテスト。
+    def test_合計が奇数のとき立替が少なかった側が端数を負担する(self):
+        """端数ルール（DESIGN.md §4 冒頭で確定, 2026-08-04）。
 
-        ⚠️ DESIGN.md §4 冒頭は「端数は支払者に多く負担させる
-        （例：3円 → 支払者2円/相手1円）」と書いているが、
-        現在の実装では **月内で立替が少なかった側** が 1 円多く負担する。
+        月の合計が奇数のとき、1人あたりの負担額は切り捨て（合計 // 2）とし、
+        月内で立替額が少なかった側が余りの 1 円を負担する。
 
-        合計 3 円・ありすが 3 円立替の場合:
+        合計 3 円・ありすが 3 円立替（ひつじは 0 円）の場合:
           per_person = 3 // 2 = 1
           transfer   = 3 - 1  = 2  ← ひつじが 2 円払う
-          → ありす負担 1 円 / ひつじ負担 2 円
-
-        DESIGN.md 通りなら「支払者（ありす）が 2 円」なので逆になっている。
-        月次集計では両者が支払者なので設計文の解釈が定まっていないのが原因。
-        1 円の差なので実害は小さいが、仕様として決め直す必要がある（未決）。
+          → ありす負担 1 円 / ひつじ負担 2 円（立替 0 円のひつじが 1 円多く負担）
         """
         per_person, transfer = split_equally(total_amount=3, user_a_paid=3)
         assert per_person == 1  # 切り捨て
-        assert transfer == 2  # 現在の挙動
+        assert transfer == 2
+
+    def test_端数ルールは立替が多かった側に有利になる(self):
+        """DESIGN.md §4 冒頭の例と同じケースを検証する。
+
+        合計 10,001 円 / ありす立替 6,000 円 / ひつじ立替 4,001 円
+          → ありす負担 5,000 円 / ひつじ負担 5,001 円
+        """
+        total, a_paid = 10001, 6000
+        per_person, transfer = split_equally(total, a_paid)
+
+        assert per_person == 5000
+        assert transfer == 1000  # ひつじ → ありす
+
+        alice_burden = a_paid - transfer
+        hitsuji_burden = (total - a_paid) + transfer
+        assert alice_burden == 5000
+        assert hitsuji_burden == 5001  # 立替が少なかった側が 1 円多い
 
     def test_端数があっても両者の負担合計は総額と一致する(self):
         """1 円が消えたり増えたりしないことの確認（これは満たしている）。"""
