@@ -30,6 +30,45 @@ from app.services import expense as expense_svc
 from app.services.events import write_event
 
 
+# ============================================================
+# 純関数（DB もセッションも request も触らない）
+#   → コンテナを起動しなくてもテストできる
+# ============================================================
+
+
+def ensure_judgeable(
+    *,
+    status: str,
+    imported_by: int,
+    actor_user_id: int,
+    action: str,
+) -> None:
+    """ステージング行を判定（adopt / exclude）できる状態か検証する。
+
+    adopt() と exclude() の両方で同じルールを使うため、ここに集約している。
+    ORM オブジェクトではなく値を受け取るので、DB なしで検証・テストできる。
+
+    Args:
+        status: ステージング行の現在の状態（pending / adopted / excluded）
+        imported_by: その行を取り込んだユーザーの id
+        actor_user_id: いま操作しようとしているユーザーの id
+        action: エラーメッセージに出す操作名（"adopt" / "exclude"）
+
+    Raises:
+        ValueError: 判定できない状態のとき
+    """
+    if status != "pending":
+        raise ValueError(f"staging.status={status} は {action} できません")
+    if imported_by != actor_user_id:
+        # DESIGN.md §1.4: PayPay 履歴は各自が自分の分をアップロードする
+        raise ValueError("他人のステージング行は判定できません")
+
+
+# ============================================================
+# サービス（DB を触る）
+# ============================================================
+
+
 def _parse_csv(text: str, imported_by: int, imported_at: datetime) -> list[dict]:
     """CSV 文字列を staging INSERT 用の dict のリストに変換。"""
     reader = csv.DictReader(io.StringIO(text))
@@ -90,10 +129,12 @@ def adopt(
     note: str | None,
 ) -> PayPayImportStaging:
     """staging を「共有」として採用し、Expense に昇格させる。"""
-    if staging.status != "pending":
-        raise ValueError(f"staging.status={staging.status} は adopt できません")
-    if staging.imported_by != user.id:
-        raise ValueError("他人のステージング行は判定できません")
+    ensure_judgeable(
+        status=staging.status,
+        imported_by=staging.imported_by,
+        actor_user_id=user.id,
+        action="adopt",
+    )
 
     # Expense を作成（source_staging_id を紐付ける）
     # ★ create_expense_core を使う（commit しない版）。
@@ -129,10 +170,12 @@ def adopt(
 def exclude(
     session: Session, user: User, staging: PayPayImportStaging, reason: str | None
 ) -> PayPayImportStaging:
-    if staging.status != "pending":
-        raise ValueError(f"staging.status={staging.status} は exclude できません")
-    if staging.imported_by != user.id:
-        raise ValueError("他人のステージング行は判定できません")
+    ensure_judgeable(
+        status=staging.status,
+        imported_by=staging.imported_by,
+        actor_user_id=user.id,
+        action="exclude",
+    )
 
     staging.status = "excluded"
     session.flush()

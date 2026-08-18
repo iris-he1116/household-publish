@@ -134,8 +134,12 @@ uv run pytest tests/unit/    # 純関数のみ（DB 不要・高速）
 uv run pytest -v             # 各テスト名を表示
 ```
 
-- **`tests/unit/`** — DB を触らない純関数のテスト。コンテナが停止していても走る
+- **`tests/unit/`** — DB を触らない純関数のテスト。**コンテナが停止していても走る**（実測 0.01 秒）
 - **`tests/integration/`** — DB に接続するテスト。`household_test` という**別 DB** を自動作成して使うため、開発用データ（`household`）は汚れない
+
+業務ルールを「DB も request も触らない純関数」として切り出しておくと、`tests/unit/` に置けて実行が速くなる。
+例：`services/settlement.py` の `split_equally()` / `next_status_on_confirm()`、
+`services/paypay_import.py` の `ensure_judgeable()`。
 
 テスト用 DB を作り直したいときは `DROP DATABASE household_test;` すれば次回の実行で再作成される。
 

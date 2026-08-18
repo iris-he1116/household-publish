@@ -88,9 +88,16 @@ def _run_migrations() -> None:
     command.upgrade(cfg, "head")
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def prepare_test_database():
-    """テストセッション全体で1回だけ: DB作成 + マイグレーション適用。"""
+    """テストセッション全体で1回だけ: DB作成 + マイグレーション適用。
+
+    ★ autouse にしてはいけない ★
+    autouse にすると、DB を使わない tests/unit/ のテストまで DB 接続を要求し、
+    「純関数はコンテナなしでテストできる」という利点が失われる。
+    下の `session` フィクスチャから依存させることで、
+    DB を使うテストだけがこの準備を発火させる。
+    """
     _create_test_database_if_missing()
     _run_migrations()
     yield
@@ -107,8 +114,11 @@ def _truncate_all() -> None:
 
 
 @pytest.fixture
-def session() -> Session:
-    """1テスト = 1セッション。終了後にテーブルを空にする。"""
+def session(prepare_test_database) -> Session:
+    """1テスト = 1セッション。終了後にテーブルを空にする。
+
+    このフィクスチャを要求したテストだけが DB 準備を発火させる。
+    """
     s = SessionLocal()
     try:
         yield s
