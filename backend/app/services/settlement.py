@@ -18,18 +18,26 @@ from app.services.events import write_event
 def split_equally(total_amount: int, user_a_paid: int) -> tuple[int, int]:
     """1人あたりの分担額と、B→A への送金額を返す。
 
-    折半で端数が出る場合は「支払者に多く負担」の思想（DESIGN.md §4 冒頭）を
-    そのまま踏襲。ここでは per_person は floor で切り捨てて表示し、
-    実際の送金額は total_amount // 2 と一致させないケースに備える。
+    端数ルール（DESIGN.md §4 冒頭で確定, 2026-08-04）:
+      月の合計が奇数のとき、1人あたりの負担額は切り捨て（合計 // 2）とし、
+      **月内で立替額が少なかった側が余りの1円を負担する**。
 
-    シンプル版:
-      per_person = total_amount // 2  （端数1円は表示上は A/B どちらかに寄る）
-      transfer_from_b_to_a = user_a_paid - per_person
+      例: 合計 10,001 円 / A 立替 6,000 円 / B 立替 4,001 円
+          per_person = 10001 // 2 = 5,000
+          transfer   = 6000 - 5000 = 1,000（B → A）
+          → A 負担 5,000 円 / B 負担 5,001 円
+
+      差額は最大1円/月なので、交互負担や繰越しは導入しない（KISS / YAGNI）。
+
+    Args:
+        total_amount: その月の共有支出合計
+        user_a_paid: A（ありす, users.id=1）の立替額
 
     Returns:
         (per_person_share, transfer_from_b_to_a)
+        transfer > 0 なら B → A、transfer < 0 なら A → B に送金。
     """
-    per_person = total_amount // 2  # 端数切り捨て。表示用の目安。
+    per_person = total_amount // 2  # 端数切り捨て
     transfer = user_a_paid - per_person
     return per_person, transfer
 
