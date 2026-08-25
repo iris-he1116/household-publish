@@ -16,7 +16,7 @@
 | 設定・バリデーション | Pydantic 2 / pydantic-settings |
 | ログ | structlog（JSON 構造化ログ） |
 | パッケージ管理 | uv |
-| フロントエンド | Next.js（App Router）＋ shadcn/ui ／ Tailwind CSS（**Phase 4 で実装予定**） |
+| フロントエンド | Next.js 16（App Router）/ React 19 / TypeScript / Tailwind CSS v4 |
 
 ---
 
@@ -27,12 +27,13 @@
 | Phase 1 | 設計（ドメイン / アーキテクチャ / データモデル / UI モック） | 完了 |
 | Phase 2 | DB 基盤（PostgreSQL コンテナ / SQLAlchemy モデル / Alembic） | 完了 |
 | Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了（AI 連携は不要と判断して見送り → [DESIGN.md §1.8](DESIGN.md)） |
-| Phase 4 | フロントエンド（Next.js） | **次はここ** |
+| Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | **前半完了**（後半は未着手） |
 | Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 一部着手（テスト基盤のみ） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
 | Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
 
-現時点で操作できるのは **Swagger UI（`http://localhost:8000/docs`）のみ**。ブラウザ向けの画面は Phase 4 で作る。
+ブラウザで **`http://localhost:3000`** を開くと3画面（ホーム／月次清算／PayPay 取り込み）が使える。
+API 単体を試したいときは Swagger UI（`http://localhost:8000/docs`）。
 
 ---
 
@@ -100,11 +101,32 @@ uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
 ```
 
-### 8. ブラウザで開く
+### 8. フロントエンドを起動（別ターミナル）
 
-<http://localhost:8000/docs>
+前提：Node.js 20 以上
 
-Swagger UI から全 API を試せる。認証は Phase 5 実装予定のため、Phase 3 時点では
+```bash
+cd frontend
+npm install                  # 初回のみ
+npm run dev
+```
+
+`frontend/.env.local` を作って接続先を指定する（`.gitignore` 済み）。
+
+```
+API_BASE_URL=http://127.0.0.1:8000
+API_USER_ID=1
+```
+
+`API_USER_ID` は認証ができるまでの暫定。`1` = ありす／`2` = ひつじ。
+
+### 9. ブラウザで開く
+
+<http://localhost:3000>
+
+3画面（ホーム／月次清算／PayPay 取り込み）が使える。
+
+API 単体を試したいときは Swagger UI（<http://localhost:8000/docs>）。認証は Phase 5 実装予定のため、
 リクエストヘッダ `X-User-Id`（`1` = ありす／`2` = ひつじ／省略時は `1`）でユーザーを切り替える。
 
 ---
@@ -153,7 +175,8 @@ uv run pytest -v             # 各テスト名を表示
 | [`PHASE2_PLAN.md`](PHASE2_PLAN.md) | **Phase 2（DB）の構築手順と実行ログ**。Podman / Alembic のハマりどころ付き |
 | [`PHASE3_PLAN.md`](PHASE3_PLAN.md) | **Phase 3（API）の実装手順と実行ログ**。E2E 検証結果とハマりどころ付き |
 | [`PHASE4_PLAN.md`](PHASE4_PLAN.md) | **Phase 4（フロント）の実行計画**。Next.js 16 の作法（Server Actions / キャッシュ）と画面ごとのサーバー・クライアント振り分け |
-| [`mockups/`](mockups/) | UI モック（ワイヤーフレーム）7枚：ダッシュボード／支出一覧／月次清算／PayPay 取り込み／カテゴリ管理／ログイン／アカウントメニュー |
+| [`mockups/`](mockups/) | UI モック（ワイヤーフレーム）。**3画面 × PC版/スマホ版 の6枚**：ホーム／月次清算／PayPay 取り込み。加えて Phase 5 用のログイン画面 |
+| [`slides/`](slides/) | 勉強会（Phase 4 前半）の発表資料。`phase4_frontend.pptx` と全文テキスト版 `phase4_frontend_text.md` |
 
 ---
 
@@ -163,7 +186,10 @@ uv run pytest -v             # 各テスト名を表示
 - **負担割合は常に折半（50:50 固定）**。端数は支払者が多く負担する。支出ごとの割合上書きは持たない。
 - **清算サイクルは月次（暦月）**。`in_progress → closed → partially_confirmed → settled` の状態機械で管理し、清算済月の支出を編集しても状態は巻き戻さず「更新あり」フラグを立てるだけにする。
 - **`events` テーブルは追記専用のビジネスイベントログ**。書き込みは `services/events.py` の `write_event()` 1本のみを経由する。運用目的のシステムログ（structlog）とは明確に分ける。
-- **依存の向きは一方通行**。バックエンドは `api/ → services/ → db/`、フロントは `app/ → features/ → components/ui/`。
+- **依存の向きは一方通行**。バックエンドは `api/ → services/ → db/`、フロントは `app/ → features/ → lib/`。
+- **フロントは `'use client'` を葉にだけ付ける**。ページと layout はサーバーコンポーネントのまま保つ（実測：サーバー17 / クライアント8）。
+- **フロントの状態は URL に持たせる**。絞り込み・ページ送り・対象月はクエリ/パスに置き、`useState` を使わない。
+- **表示と更新で経路を分ける**。表示はサーバーコンポーネントから直接 `await`、更新は Server Actions 経由。API の URL をブラウザに露出させない。
 
 ---
 

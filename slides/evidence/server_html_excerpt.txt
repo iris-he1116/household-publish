@@ -1,0 +1,11 @@
+サーバーが返した HTML の抜粋（curl http://localhost:3000）
+ブラウザで JavaScript が動く前に、この状態で届いている
+
+── 「19,054」の周辺 ──
+\":\"text-lg font-bold text-gray-900\",\"children\":\"最近の支出\"},\"$4e\",\"$9a\",1],[\"$\",\"p\",null,{\"className\":\"text-xs text-gray-500\",\"children\":[\"全 \",8,\" 件 / 合計 \",\"¥19,054\"]},\"$4e\",\"$9b\",1]]},\"$4e\",\"$99\",1],[\"$\",\"div\",null,{\"classN
+
+── 「2,513」の周辺 ──
+-xs text-cyan-800\",\"children\":[\"現時点の差額（\",\"ひつじ → ありす\",\"）\"]},\"$45\",\"$10c\",1],[\"$\",\"p\",null,{\"className\":\"mt-1 text-2xl font-bold text-cyan-800\",\"children\":\"¥ 2,513\"},\"$45\",\"$10d\",1],[\"$\",\"p\",null,{\"className\":\"mt-0.5 text-xs t
+
+── 「中華食材」の周辺 ──
+l,{\"className\":\"whitespace-nowrap px-3 py-2 text-gray-900\",\"children\":\"食費\"},\"$4e\",\"$b0\",1],[\"$\",\"td\",null,{\"className\":\"px-3 py-2 text-gray-600\",\"children\":\"中華食材\"},\"$4e\",\"$b1\",1],[\"$\",\"td\",null,{\"className\":\"whitespace-nowrap

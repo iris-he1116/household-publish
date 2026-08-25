@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">
+  <rect x="0" y="0" width="390" height="844" rx="28" fill="#ffffff" stroke="#111827" stroke-width="2"/>
+
+  <!-- status bar -->
+  <text x="24" y="30" font-size="11" font-weight="600">9:41</text>
+  <text x="366" y="30" font-size="11" text-anchor="end">▮▮▮ ⏺</text>
+
+  <!-- header -->
+  <rect x="2" y="42" width="386" height="46" fill="#111827"/>
+  <text x="20" y="71" fill="#ffffff" font-size="14" font-weight="600">月次清算</text>
+  <text x="370" y="71" fill="#d1d5db" font-size="11" text-anchor="end">ありす ▾</text>
+
+  <!-- month selector -->
+  <rect x="16" y="100" width="358" height="40" rx="8" fill="#ffffff" stroke="#d1d5db"/>
+  <text x="36" y="125" font-size="16" font-weight="600">◂</text>
+  <text x="195" y="125" font-size="15" font-weight="600" text-anchor="middle">2026年7月</text>
+  <text x="354" y="125" font-size="16" font-weight="600" text-anchor="end">▸</text>
+
+  <!-- status pill -->
+  <rect x="16" y="150" width="130" height="26" rx="13" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="30" y="168" font-size="11" fill="#92400e">締め済み・要確認</text>
+  <text x="374" y="168" font-size="11" fill="#6b7280" text-anchor="end">15 件</text>
+
+  <!-- ===== 送金額（一番大事なので最上部に大きく） ===== -->
+  <rect x="16" y="188" width="358" height="106" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="1.5"/>
+  <text x="195" y="214" font-size="12" fill="#0e7490" text-anchor="middle">ひつじ → ありす</text>
+  <text x="195" y="256" font-size="34" font-weight="700" fill="#0e7490" text-anchor="middle">¥ 5,720</text>
+  <text x="195" y="280" font-size="11" fill="#0e7490" text-anchor="middle">を送金してください</text>
+
+  <!-- ===== summary ===== -->
+  <rect x="16" y="308" width="358" height="118" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="32" y="330" font-size="12" fill="#6b7280">共有支出の合計</text>
+  <text x="358" y="330" font-size="14" font-weight="700" text-anchor="end">¥ 52,720</text>
+  <line x1="32" y1="342" x2="358" y2="342" stroke="#f3f4f6"/>
+
+  <text x="32" y="364" font-size="12" fill="#6b7280">1人あたりの負担</text>
+  <text x="358" y="364" font-size="14" font-weight="700" text-anchor="end">¥ 26,360</text>
+  <line x1="32" y1="376" x2="358" y2="376" stroke="#f3f4f6"/>
+
+  <text x="32" y="398" font-size="12" fill="#6b7280">ありすの立替</text>
+  <text x="358" y="398" font-size="13" text-anchor="end">¥ 32,080</text>
+
+  <text x="32" y="418" font-size="12" fill="#6b7280">ひつじの立替</text>
+  <text x="358" y="418" font-size="13" text-anchor="end">¥ 20,640</text>
+
+  <!-- ===== confirmation ===== -->
+  <rect x="16" y="440" width="358" height="150" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="32" y="462" font-weight="600" font-size="13">双方の確認</text>
+  <text x="358" y="462" font-size="10" fill="#6b7280" text-anchor="end">2人とも押すと清算済</text>
+
+  <rect x="32" y="474" width="326" height="42" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="48" y="492" font-size="12" font-weight="600">ありす</text>
+  <text x="48" y="509" font-size="10" fill="#166534">✓ 確認済み（08-01 09:12）</text>
+
+  <rect x="32" y="524" width="326" height="42" rx="8" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="48" y="542" font-size="12" font-weight="600">ひつじ</text>
+  <text x="48" y="559" font-size="10" fill="#6b7280">未確認</text>
+
+  <!-- 大きい確認ボタン（親指の届く位置） -->
+  <rect x="32" y="574" width="326" height="0" fill="none"/>
+  <rect x="16" y="602" width="358" height="50" rx="10" fill="#111827"/>
+  <text x="195" y="633" fill="#ffffff" font-size="15" font-weight="600" text-anchor="middle">内容を確認して清算する</text>
+
+  <!-- ===== category breakdown（折りたたみ） ===== -->
+  <rect x="16" y="666" width="358" height="112" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="32" y="688" font-weight="600" font-size="13">カテゴリ別内訳</text>
+  <text x="358" y="688" font-size="14" fill="#9ca3af" text-anchor="end">⌄</text>
+
+  <text x="32" y="712" font-size="11">食費</text>
+  <rect x="90" y="701" width="150" height="14" fill="#60a5fa"/>
+  <text x="358" y="712" font-size="11" text-anchor="end">¥19,360</text>
+
+  <text x="32" y="734" font-size="11">外食</text>
+  <rect x="90" y="723" width="113" height="14" fill="#f87171"/>
+  <text x="358" y="734" font-size="11" text-anchor="end">¥14,600</text>
+
+  <text x="32" y="756" font-size="11">日用品</text>
+  <rect x="90" y="745" width="62" height="14" fill="#34d399"/>
+  <text x="358" y="756" font-size="11" text-anchor="end">¥8,020</text>
+
+  <text x="32" y="772" font-size="10" fill="#2563eb">残り2件を表示 ⌄</text>
+
+  <!-- bottom tab -->
+  <rect x="2" y="790" width="386" height="52" fill="#ffffff" stroke="#e5e7eb"/>
+  <line x1="2" y1="790" x2="388" y2="790" stroke="#e5e7eb"/>
+
+  <text x="80" y="812" font-size="16" text-anchor="middle">🏠</text>
+  <text x="80" y="830" font-size="10" fill="#9ca3af" text-anchor="middle">ホーム</text>
+
+  <text x="195" y="812" font-size="16" text-anchor="middle">📊</text>
+  <text x="195" y="830" font-size="10" font-weight="600" text-anchor="middle">清算</text>
+
+  <text x="310" y="812" font-size="16" text-anchor="middle">📥</text>
+  <text x="310" y="830" font-size="10" fill="#9ca3af" text-anchor="middle">PayPay</text>
+  <circle cx="325" cy="805" r="7" fill="#dc2626"/>
+  <text x="325" y="809" fill="#ffffff" font-size="9" font-weight="600" text-anchor="middle">4</text>
+</svg>

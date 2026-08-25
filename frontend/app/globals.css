@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/*
+ * ライトモード固定。
+ *
+ * create-next-app の既定は prefers-color-scheme でダークに切り替わるが、
+ * 今回はダークモード対応をスコープ外にしている（DESIGN.md §1.9）。
+ * users.theme_preference カラムは用意してあるので、Phase 5 で対応する。
+ */
+body {
+  background: #ffffff;
+  color: #111827;
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP",
+    Meiryo, sans-serif;
+}
