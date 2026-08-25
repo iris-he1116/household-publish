@@ -26,7 +26,7 @@
 | :---- | :---- | :---- |
 | Phase 1 | 設計（ドメイン / アーキテクチャ / データモデル / UI モック） | 完了 |
 | Phase 2 | DB 基盤（PostgreSQL コンテナ / SQLAlchemy モデル / Alembic） | 完了 |
-| Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了 |
+| Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了（AI 連携は不要と判断して見送り → [DESIGN.md §1.8](DESIGN.md)） |
 | Phase 4 | フロントエンド（Next.js） | **次はここ** |
 | Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 一部着手（テスト基盤のみ） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
