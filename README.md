@@ -152,6 +152,7 @@ uv run pytest -v             # 各テスト名を表示
 | [`DESIGN.md`](DESIGN.md) | **設計方針書**。設計の大前提／ドメイン／採用アーキテクチャ／データモデル／ディレクトリ構成／Phase 3 実装ステータス（§7） |
 | [`PHASE2_PLAN.md`](PHASE2_PLAN.md) | **Phase 2（DB）の構築手順と実行ログ**。Podman / Alembic のハマりどころ付き |
 | [`PHASE3_PLAN.md`](PHASE3_PLAN.md) | **Phase 3（API）の実装手順と実行ログ**。E2E 検証結果とハマりどころ付き |
+| [`PHASE4_PLAN.md`](PHASE4_PLAN.md) | **Phase 4（フロント）の実行計画**。Next.js 16 の作法（Server Actions / キャッシュ）と画面ごとのサーバー・クライアント振り分け |
 | [`mockups/`](mockups/) | UI モック（ワイヤーフレーム）7枚：ダッシュボード／支出一覧／月次清算／PayPay 取り込み／カテゴリ管理／ログイン／アカウントメニュー |
 
 ---
