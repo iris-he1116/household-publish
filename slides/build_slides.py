@@ -464,10 +464,11 @@ rows = [["答え", "どうする"],
 table(s, 5.1, 2.14, 4.4, rows, [1.0, 3.4], row_h=0.34,
       header_h=0.28, font_size=10.5)
 
-note_box(s, 5.1, 3.28, 4.4, 0.66,
-         "ページ（根）に付けると配下が全部クライアントになる。"
-         "操作がある部品にだけ付ける。",
-         fill=PANEL, line=LINE, ink=INK, size=10,
+note_box(s, 5.1, 3.16, 4.4, 1.00,
+         "ページ（根）に 'use client' を書くと配下が全部クライアントになる。"
+         "ただし layout の中にクライアント部品を「置く」のは別。"
+         "その部品だけがクライアントで、children はサーバーのまま。",
+         fill=PANEL, line=LINE, ink=INK, size=9.5,
          bold_head="原則： 'use client' は葉に付ける。根に付けない")
 
 tf = textbox(s, ML, 3.62, 4.4, 0.5)
