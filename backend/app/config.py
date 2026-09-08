@@ -24,6 +24,21 @@ class Settings(BaseSettings):
     # ログレベル（DEBUG / INFO / WARNING / ERROR）
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
+    # --- 認証（DESIGN.md §4.1「JWT + スライディング期限」）---
+
+    # JWT の署名鍵。これが漏れると誰でもトークンを偽造できる。
+    # 変更すると既存の全トークンが無効になる（＝全員ログアウト）。
+    jwt_secret: str = Field(alias="JWT_SECRET", min_length=32)
+
+    # JWT の有効期限（日）。API を通るたびに再発行して延長するので、
+    # 「この日数だけ連続でアプリを開かなかったら再ログイン」の意味になる。
+    jwt_expire_days: int = Field(default=30, alias="JWT_EXPIRE_DAYS")
+
+    # Cookie に Secure 属性を付けるか。
+    # HTTPS でのみ Cookie を送る指示。tailscale serve 経由（https）では true。
+    # 素の HTTP で運用する場合は false にしないとログインできない。
+    cookie_secure: bool = Field(default=True, alias="COOKIE_SECURE")
+
 
 # シングルトン
 settings = Settings()

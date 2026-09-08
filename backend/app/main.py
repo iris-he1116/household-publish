@@ -62,8 +62,9 @@ def healthz() -> dict:
 
 
 # --- 各機能のルーター登録（後で埋める） ---
-from app.api import categories, expenses, settlements, paypay_import  # noqa: E402
+from app.api import auth, categories, expenses, settlements, paypay_import  # noqa: E402
 
+app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(expenses.router)
 app.include_router(settlements.router)

@@ -1,12 +1,16 @@
 """MonthlySettlement API のルーター。"""
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 
-from app.api.deps import CurrentUserDep, SessionDep
+from app.api.deps import CurrentUserDep, SessionDep, get_current_user
 from app.api.schemas.settlement import SettlementRead, SettlementSummary
 from app.services import settlement as svc
 
 
-router = APIRouter(prefix="/api/settlements", tags=["settlements"])
+router = APIRouter(
+    prefix="/api/settlements", tags=["settlements"],
+    # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
+    dependencies=[Depends(get_current_user)],
+)
 
 YearMonthParam = Path(pattern=r"^\d{4}-\d{2}$", description="'2026-07' の形式")
 
