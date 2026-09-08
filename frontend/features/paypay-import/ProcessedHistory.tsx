@@ -45,7 +45,7 @@ export async function ProcessedHistory() {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold text-gray-900">判定済みの履歴</h2>
         <p className="text-xs text-gray-500">
-          取引ID で重複を判定しているので、同じ取引は二重に登録されません
+          取引番号で重複を判定しているので、同じ取引は二重に登録されません
         </p>
       </div>
 

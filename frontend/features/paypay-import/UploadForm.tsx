@@ -28,7 +28,7 @@ export function UploadForm() {
           PayPay の履歴 CSV をアップロード
         </p>
         <p className="mt-1 text-center text-xs text-gray-400">
-          列は 取引日 / 金額 / 店舗名 / 取引ID
+          PayPay アプリからダウンロードした CSV をそのまま選べます
         </p>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
@@ -68,7 +68,7 @@ export function UploadForm() {
       )}
 
       <p className="text-xs text-gray-500">
-        同じ取引を二重に登録しないよう、取引ID で重複を判定しています。
+        同じ取引を二重に登録しないよう、取引番号で重複を判定しています。チャージ・ポイント獲得・送金は支出ではないので自動的に除かれます。
         取り込めるのは自分の履歴だけで、相手の分は表示されません。
       </p>
     </section>
