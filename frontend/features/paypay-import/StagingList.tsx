@@ -23,7 +23,7 @@ export async function StagingList() {
     <section className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-lg font-bold text-gray-900">
-          未判定の行（{rows.length} 件）
+          未判定の明細（残り {rows.length} 件）
         </h2>
         {rows.length > 0 && (
           <p className="text-xs text-gray-500">
@@ -40,7 +40,7 @@ export async function StagingList() {
         <>
           <p className="text-xs text-gray-500">
             処理したい行を選び、まとめて「個人」にするか、カテゴリを指定して「共有」にします。
-            同じカテゴリごとに選択と共有登録を繰り返せます。
+            チェックしただけでは未判定のままです。どちらかのボタンで確定すると残り件数が減ります。
           </p>
           <BulkStagingList rows={rows} categories={categories} />
         </>

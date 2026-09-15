@@ -51,11 +51,24 @@ export function BulkStagingList({
   return (
     <>
       <div className="sticky top-2 z-10 space-y-3 rounded-xl border border-gray-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:top-14">
-        <div>
-          <p className="text-xs font-semibold text-gray-500">処理する明細を選択</p>
-          <p className="mt-1 text-sm text-gray-700">
-            {selectedRows.length} 件・{yen(selectedTotal)} を選択中
-          </p>
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold text-gray-500">選択中</p>
+            <p aria-live="polite" className="mt-0.5 text-gray-900">
+              <span className="text-2xl font-bold tabular-nums">
+                {selectedRows.length}
+              </span>
+              <span className="ml-1 text-sm">件</span>
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-semibold tabular-nums text-gray-800">
+              {yen(selectedTotal)}
+            </p>
+            <p className="mt-0.5 text-xs text-gray-500">
+              未選択 {rows.length - selectedRows.length} 件 / 全 {rows.length} 件
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
