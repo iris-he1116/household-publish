@@ -10,12 +10,30 @@
  * これは意図的な設計:
  *   - API の URL がブラウザに露出しない
  *   - CORS 設定が不要（ブラウザは Next.js しか叩かない）
- *   - Phase 5 で JWT を Cookie に入れるとき、Cookie の扱いがサーバー側で完結する
+ *   - JWT を Cookie に入れたとき、Cookie の扱いがサーバー側で完結する
+ *
+ * ## 認証（Phase 5）
+ *
+ * ブラウザ → Next.js の Cookie を、そのまま Next.js → FastAPI に転送する。
+ * ブラウザ側で JWT を扱うコードは1行も無い（HttpOnly なので読めない）。
+ *
+ *     ブラウザ  --Cookie-->  Next.js(サーバー)  --Cookie-->  FastAPI
+ *
+ * FastAPI はリクエストごとに新しい JWT を Set-Cookie で返す（スライディング期限）。
+ * ただし **Next.js はサーバーコンポーネントから Cookie を書けない**
+ * （node_modules/next/dist/docs/01-app/03-api-reference/04-functions/cookies.md:74
+ *   「HTTP does not allow setting cookies after streaming starts」）。
+ * そのため期限の延長は Server Actions 経由の更新操作のときだけ反映される。
+ * 閲覧だけで30日放置した場合は再ログインになるが、実運用では支出を入力するので問題ない。
  */
 import "server-only";
 
+import { cookies } from "next/headers";
+
 const BASE = process.env.API_BASE_URL ?? "http://127.0.0.1:8000";
-const USER_ID = process.env.API_USER_ID ?? "1";
+
+/** バックエンドと合わせる Cookie 名（backend/app/api/deps.py の SESSION_COOKIE）。 */
+export const SESSION_COOKIE = "household_session";
 
 /** API が 2xx を返さなかったときに投げる。 */
 export class ApiError extends Error {
@@ -29,13 +47,33 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/** 未ログイン（401）。呼び出し側でログイン画面に飛ばすために型で区別する。 */
+export class UnauthorizedError extends ApiError {
+  constructor(detail: unknown, requestId: string | null) {
+    super(401, detail, requestId);
+    this.name = "UnauthorizedError";
+  }
+}
+
+/**
+ * FastAPI が返した Set-Cookie をそのまま持ち回るための型。
+ * Server Actions 側で cookies().set() に反映する。
+ */
+export type ApiResult<T> = { data: T; setCookie: string | null };
+
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<ApiResult<T>> {
+  // ブラウザから来た Cookie を FastAPI に転送する
+  const jar = await cookies();
+  const session = jar.get(SESSION_COOKIE)?.value;
+
   const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      // Phase 3 の暫定認証。Phase 5 で Cookie 由来の JWT に差し替える。
-      "X-User-Id": USER_ID,
+      ...(session ? { Cookie: `${SESSION_COOKIE}=${session}` } : {}),
       ...init?.headers,
     },
     // Next.js 16 では fetch は既定でキャッシュされないが、
@@ -52,24 +90,35 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       detail = await res.text().catch(() => null);
     }
+    if (res.status === 401) throw new UnauthorizedError(detail, requestId);
     throw new ApiError(res.status, detail, requestId);
   }
 
-  if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
+  const setCookie = res.headers.get("set-cookie");
+  if (res.status === 204) return { data: undefined as T, setCookie };
+  return { data: (await res.json()) as T, setCookie };
 }
 
-export const apiGet = <T>(path: string) => request<T>(path);
+// --- 表示用（サーバーコンポーネントから使う。Cookie は更新できないので捨てる）---
 
-export const apiPost = <T>(path: string, body: unknown) =>
+export const apiGet = async <T>(path: string): Promise<T> =>
+  (await request<T>(path)).data;
+
+// --- 更新用（Server Actions から使う。setCookie を呼び出し側で反映する）---
+
+export const apiPostRaw = <T>(path: string, body: unknown) =>
   request<T>(path, { method: "POST", body: JSON.stringify(body) });
 
-export const apiPatch = <T>(path: string, body: unknown) =>
-  request<T>(path, { method: "PATCH", body: JSON.stringify(body) });
+export const apiPost = async <T>(path: string, body: unknown): Promise<T> =>
+  (await apiPostRaw<T>(path, body)).data;
+
+export const apiPatch = async <T>(path: string, body: unknown): Promise<T> =>
+  (await request<T>(path, { method: "PATCH", body: JSON.stringify(body) })).data;
 
 // DELETE は 204（本文なし）が返るので、返り値は無い。
-export const apiDelete = (path: string) =>
-  request<void>(path, { method: "DELETE" });
+export const apiDelete = async (path: string): Promise<void> => {
+  await request<void>(path, { method: "DELETE" });
+};
 
 // ============================================================
 // 型（バックエンドの Pydantic スキーマに対応）
@@ -217,7 +266,7 @@ export const getSettlements = () =>
 /**
  * PayPay 取り込みのステージング行を取る。
  *
- * `only_mine=true`（既定）だと、サーバーが X-User-Id を見て
+ * `only_mine=true`（既定）だと、サーバーがログイン中のユーザーを見て
  * 自分がアップロードした分だけを返す。相手の履歴は見えない。
  */
 export const getStagingRows = (status?: StagingRow["status"]) => {
@@ -225,3 +274,13 @@ export const getStagingRows = (status?: StagingRow["status"]) => {
   if (status) params.set("status", status);
   return apiGet<StagingRow[]>(`/api/paypay-import/staging?${params}`);
 };
+
+/** ログイン中のユーザー。未ログインなら UnauthorizedError。 */
+export type Me = {
+  id: number;
+  username: string;
+  name: string;
+  display_color: string | null;
+};
+
+export const getMe = () => apiGet<Me>("/api/auth/me");

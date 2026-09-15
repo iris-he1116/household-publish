@@ -90,7 +90,7 @@ export async function closeMonth(
  * その月を「確認済み」にする。
  *
  * 2人とも押すと `settled`（清算済）になる。
- * 誰として確認するかは、サーバー側が X-User-Id ヘッダで判定する
+ * 誰として確認するかは、サーバー側が Cookie の JWT で判定する
  * （Phase 3 の暫定認証。Phase 5 で JWT に差し替える）。
  */
 export async function confirmMonth(

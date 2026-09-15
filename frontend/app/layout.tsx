@@ -1,17 +1,13 @@
 /**
- * 全画面共通のレイアウト。
+ * 全画面共通の最小レイアウト。
  *
  * ★ サーバーコンポーネント（'use client' なし）★
  *
- * ここにナビを置くことで、3画面すべてに一度で反映される。
- * ナビ自体は現在地の判定（usePathname）が要るのでクライアントだが、
- * この layout はサーバーのままなので、配下のページは影響を受けない。
+ * ここには html / body と全体のスタイルだけを置く。
+ * ナビはログイン後の画面にしか要らないので `app/(main)/layout.tsx` に移した。
+ * ログイン画面（app/login）はナビなしで表示される。
  */
 import type { Metadata } from "next";
-import { Suspense } from "react";
-
-import { AppNav } from "@/features/navigation/AppNav";
-import { AppNavSection } from "@/features/navigation/AppNavSection";
 
 import "./globals.css";
 
@@ -23,18 +19,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ja" className="h-full antialiased">
-      <body className="min-h-full bg-white text-gray-900">
-        {/*
-          バッジの件数を取る間もナビは出したいので Suspense で包み、
-          fallback ではバッジ無しのナビを出す。
-        */}
-        <Suspense fallback={<AppNav pendingCount={0} />}>
-          <AppNavSection />
-        </Suspense>
-
-        {/* スマホのボトムタブに隠れないよう、下に余白を取る */}
-        <div className="pb-16 sm:pb-0">{children}</div>
-      </body>
+      <body className="min-h-full bg-white text-gray-900">{children}</body>
     </html>
   );
 }

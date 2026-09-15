@@ -17,6 +17,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { logout } from "@/features/auth/actions";
+
 type Item = {
   href: string;
   label: string;
@@ -46,7 +48,14 @@ const ITEMS: Item[] = [
   },
 ];
 
-export function AppNav({ pendingCount = 0 }: { pendingCount?: number }) {
+export function AppNav({
+  pendingCount = 0,
+  userName,
+}: {
+  pendingCount?: number;
+  /** ログイン中のユーザー名。取得できないときは省略（ログアウトも出さない） */
+  userName?: string;
+}) {
   const pathname = usePathname();
 
   return (
@@ -80,7 +89,19 @@ export function AppNav({ pendingCount = 0 }: { pendingCount?: number }) {
             );
           })}
 
-          <span className="ml-auto py-3 text-xs text-gray-400">ありす</span>
+          {userName && (
+            <div className="ml-auto flex items-center gap-3 py-3">
+              <span className="text-xs text-gray-400">{userName}</span>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="text-xs text-gray-400 hover:text-white"
+                >
+                  ログアウト
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </header>
 
