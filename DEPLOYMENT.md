@@ -10,7 +10,7 @@ Browser -> household-web (Next.js) -> household-api (FastAPI) -> Neon PostgreSQL
 
 ## 1. Neon
 
-1. 東京リージョンにPostgreSQLプロジェクトを作る。東京が選べない場合はシンガポールを使い、Vercelのリージョンも `sin1` へ揃える。
+1. シンガポールリージョンにPostgreSQLプロジェクトを作る。Vercelのリージョンも `sin1` へ揃える。
 2. pooled connection stringを取得する。
 3. URLのスキームを `postgresql+psycopg://` にする。
 4. ローカルからAlembicを実行してから既存データを移行する。
@@ -31,7 +31,7 @@ Vercelプロジェクト名は `household-api`、Root Directoryは `backend` と
 | `COOKIE_SECURE` | `true` |
 | `LOG_LEVEL` | `INFO` |
 
-`backend/index.py` がVercel用エントリポイント。`backend/vercel.json` は東京リージョンと実行時間を設定する。
+`backend/index.py` がVercel用エントリポイント。`backend/vercel.json` はシンガポールリージョンと実行時間を設定する。
 
 ## 3. Next.jsプロジェクト
 
