@@ -55,16 +55,16 @@ export function ExpenseFilters({ state, categories }: Props) {
   const toId = (value: string) => (value === "" ? null : Number(value));
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
       {/* 月の前後移動 */}
-      <div className="flex items-center rounded-md border border-gray-200">
+      <div className="col-span-2 flex items-center justify-between rounded-md border border-gray-200 sm:col-span-1 sm:justify-start">
         <MonthLink
           href={buildHref(state, { yearMonth: shiftMonth(state.yearMonth, -1) })}
           label="前の月"
         >
           ◂
         </MonthLink>
-        <span className="px-2 py-1.5 text-sm tabular-nums text-gray-900">
+        <span className="px-2 py-1.5 text-sm font-medium tabular-nums text-gray-900">
           {state.yearMonth}
         </span>
         <MonthLink
@@ -142,7 +142,7 @@ export function ExpenseFilters({ state, categories }: Props) {
 }
 
 const selectClass =
-  "rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400";
+  "min-w-0 w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 sm:w-auto";
 
 function MonthLink({
   href,

@@ -100,10 +100,184 @@ export function ExpenseRow({ expense, categories }: Props) {
 
   const categoryName =
     categories.find((c) => c.id === expense.category_id)?.name ?? "—";
+  const note = expense.note || "メモなし";
+  const method =
+    METHOD_LABEL[expense.payment_method] ?? expense.payment_method;
+  const payer = USER_LABEL[expense.paid_by] ?? `user${expense.paid_by}`;
 
   return (
     <>
-      <tr className={editing ? "bg-blue-50/40" : "hover:bg-gray-50"}>
+      {/* スマホでは横長テーブルにせず、1件を読み切れるカードとして表示する。 */}
+      <tr className="block sm:hidden">
+        <td colSpan={COLUMN_COUNT} className="block p-0">
+          {editing ? (
+            <form action={save} className="space-y-3 bg-blue-50/40 p-3">
+              <input type="hidden" name="id" value={expense.id} />
+              <div className="grid grid-cols-2 gap-3">
+                <MobileField label="日付" error={errorOf("occurred_on")}>
+                  <input
+                    type="date"
+                    name="occurred_on"
+                    defaultValue={defaults.occurred_on}
+                    aria-invalid={Boolean(errorOf("occurred_on"))}
+                    className={inputClass(Boolean(errorOf("occurred_on")))}
+                  />
+                </MobileField>
+
+                <MobileField label="金額" error={errorOf("amount")}>
+                  <input
+                    type="number"
+                    name="amount"
+                    inputMode="numeric"
+                    step={1}
+                    defaultValue={defaults.amount}
+                    aria-invalid={Boolean(errorOf("amount"))}
+                    className={`${inputClass(Boolean(errorOf("amount")))} text-right tabular-nums`}
+                  />
+                </MobileField>
+
+                <MobileField label="カテゴリ" error={errorOf("category_id")}>
+                  <select
+                    key={`mobile-${defaults.category_id}`}
+                    name="category_id"
+                    defaultValue={defaults.category_id}
+                    aria-invalid={Boolean(errorOf("category_id"))}
+                    className={inputClass(Boolean(errorOf("category_id")))}
+                  >
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </MobileField>
+
+                <MobileField
+                  label="支払い手段"
+                  error={errorOf("payment_method")}
+                >
+                  <select
+                    key={`mobile-${defaults.payment_method}`}
+                    name="payment_method"
+                    defaultValue={defaults.payment_method}
+                    aria-invalid={Boolean(errorOf("payment_method"))}
+                    className={inputClass(Boolean(errorOf("payment_method")))}
+                  >
+                    {PAYMENT_METHODS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </MobileField>
+
+                <MobileField label="支払者" error={errorOf("paid_by")}>
+                  <select
+                    key={`mobile-${defaults.paid_by}`}
+                    name="paid_by"
+                    defaultValue={defaults.paid_by}
+                    aria-invalid={Boolean(errorOf("paid_by"))}
+                    className={inputClass(Boolean(errorOf("paid_by")))}
+                  >
+                    {PAYERS.map((p) => (
+                      <option key={p.value} value={p.value}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                </MobileField>
+
+                <div className="col-span-2">
+                  <MobileField label="メモ" error={errorOf("note")}>
+                    <input
+                      type="text"
+                      name="note"
+                      maxLength={500}
+                      placeholder="メモ"
+                      defaultValue={defaults.note}
+                      aria-invalid={Boolean(errorOf("note"))}
+                      className={inputClass(Boolean(errorOf("note")))}
+                    />
+                  </MobileField>
+                </div>
+              </div>
+
+              {failure?.message && (
+                <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                  {failure.message}
+                </p>
+              )}
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={cancel}
+                  disabled={pending}
+                  className="min-h-10 rounded-md border border-gray-200 bg-white px-4 text-sm text-gray-600 disabled:cursor-not-allowed"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className="min-h-10 rounded-md bg-blue-600 px-5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  {pending ? "保存中…" : "保存"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <article className="p-3">
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 text-xs">
+                    <time className="tabular-nums text-gray-500">
+                      {expense.occurred_on.slice(5).replace("-", "/")}
+                    </time>
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700">
+                      {categoryName}
+                    </span>
+                  </div>
+                  <p className="mt-2 truncate text-sm text-gray-900" title={note}>
+                    {note}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {method}・{payer}
+                  </p>
+                </div>
+                <p className="shrink-0 pt-0.5 text-base font-semibold tabular-nums text-gray-900">
+                  {yen(expense.amount)}
+                </p>
+              </div>
+
+              <div className="mt-2 flex justify-end gap-2 border-t border-gray-100 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditing(true)}
+                  disabled={pending}
+                  className="min-h-9 rounded-md px-3 text-sm text-blue-600 hover:bg-blue-50 disabled:text-gray-300"
+                >
+                  編集
+                </button>
+                <button
+                  type="button"
+                  onClick={remove}
+                  disabled={pending}
+                  className="min-h-9 rounded-md px-3 text-sm text-red-600 hover:bg-red-50 disabled:text-gray-300"
+                >
+                  {pending ? "処理中…" : "削除"}
+                </button>
+              </div>
+            </article>
+          )}
+        </td>
+      </tr>
+
+      <tr
+        className={`hidden sm:table-row ${
+          editing ? "bg-blue-50/40" : "hover:bg-gray-50"
+        }`}
+      >
         {editing ? (
           <>
             {/*
@@ -246,15 +420,17 @@ export function ExpenseRow({ expense, categories }: Props) {
               {categoryName}
             </td>
             {/* メモは空文字にもなり得る（編集で消したとき）ので || で拾う */}
-            <td className="px-3 py-2 text-gray-600">{expense.note || "—"}</td>
+            <td className="max-w-56 truncate whitespace-nowrap px-3 py-2 text-gray-600" title={expense.note ?? undefined}>
+              {expense.note || "—"}
+            </td>
             <td className="whitespace-nowrap px-3 py-2 text-gray-600">
-              {METHOD_LABEL[expense.payment_method] ?? expense.payment_method}
+              {method}
             </td>
             <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums font-medium text-gray-900">
               {yen(expense.amount)}
             </td>
             <td className="whitespace-nowrap px-3 py-2 text-gray-600">
-              {USER_LABEL[expense.paid_by] ?? `user${expense.paid_by}`}
+              {payer}
             </td>
             <td className="whitespace-nowrap px-3 py-2">
               <div className="flex gap-3">
@@ -282,7 +458,7 @@ export function ExpenseRow({ expense, categories }: Props) {
 
       {/* 欄を特定できなかったエラー（400・500・通信断など）は行の下に出す */}
       {failure?.message && (
-        <tr>
+        <tr className="hidden sm:table-row">
           <td colSpan={COLUMN_COUNT} className="px-3 pb-2">
             <p className="rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs text-red-700">
               {failure.message}
@@ -300,7 +476,7 @@ export function ExpenseRow({ expense, categories }: Props) {
 
 const inputClass = (hasError: boolean) =>
   [
-    "w-full rounded-md border px-2 py-1 text-sm text-gray-900",
+    "min-w-0 max-w-full w-full rounded-md border px-2 py-2 text-sm text-gray-900",
     "focus:outline-none focus:ring-2 focus:ring-blue-400",
     hasError ? "border-red-400" : "border-gray-200",
   ].join(" ");
@@ -313,4 +489,22 @@ function Cell({ children }: { children: React.ReactNode }) {
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <span className="mt-1 block text-xs text-red-600">{message}</span>;
+}
+
+function MobileField({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block min-w-0">
+      <span className="mb-1 block text-xs text-gray-500">{label}</span>
+      {children}
+      <FieldError message={error} />
+    </label>
+  );
 }

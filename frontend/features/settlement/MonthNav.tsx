@@ -23,23 +23,23 @@ export function MonthNav({ yearMonth }: { yearMonth: string }) {
   const [year, month] = yearMonth.split("-");
 
   const linkClass =
-    "rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 sm:px-3 sm:text-sm";
+    "flex size-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 sm:h-auto sm:w-auto sm:px-3 sm:py-1.5";
 
   return (
     <nav
       aria-label="表示月を切り替える"
-      className="grid grid-cols-[auto_1fr_auto] items-center gap-2 border-b border-gray-100 px-4 py-3 sm:gap-3 sm:px-5 sm:py-4"
+      className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-2 border-b border-gray-100 px-3 py-3 sm:grid-cols-[auto_1fr_auto] sm:gap-3 sm:px-5 sm:py-4"
     >
       <Link
         href={`/?ym=${prev}`}
         className={linkClass}
         aria-label={`${prev}を表示`}
       >
-        <span className="sm:hidden">◂ 前月</span>
+        <span aria-hidden="true" className="sm:hidden">◂</span>
         <span className="hidden sm:inline">◂ {prev}</span>
       </Link>
       <div className="min-w-0 text-center">
-        <h1 className="truncate text-base font-bold text-gray-900 sm:text-xl">
+        <h1 className="whitespace-nowrap text-[15px] font-bold text-gray-900 sm:text-xl">
           {year}年{Number(month)}月の精算
         </h1>
       </div>
@@ -48,7 +48,7 @@ export function MonthNav({ yearMonth }: { yearMonth: string }) {
         className={linkClass}
         aria-label={`${next}を表示`}
       >
-        <span className="sm:hidden">次月 ▸</span>
+        <span aria-hidden="true" className="sm:hidden">▸</span>
         <span className="hidden sm:inline">{next} ▸</span>
       </Link>
     </nav>

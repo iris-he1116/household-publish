@@ -79,8 +79,8 @@ export function QuickExpenseForm({ categories, today }: Props) {
 
   return (
     <section className="rounded-lg border border-gray-200 p-4">
-      <div className="flex items-baseline gap-3">
-        <h2 className="text-lg font-bold text-gray-900">支出を記録</h2>
+      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
+        <h2 className="whitespace-nowrap text-lg font-bold text-gray-900">支出を記録</h2>
         <p className="text-xs text-gray-500">使ったらすぐ入力（PayPay 以外）</p>
       </div>
 
@@ -226,7 +226,7 @@ export function QuickExpenseForm({ categories, today }: Props) {
 
 const inputClass = (hasError: boolean) =>
   [
-    "w-full rounded-md border px-3 py-2 text-sm text-gray-900",
+    "min-w-0 max-w-full w-full rounded-md border px-3 py-2 text-sm text-gray-900",
     "focus:outline-none focus:ring-2 focus:ring-blue-400",
     hasError ? "border-red-400" : "border-gray-200",
   ].join(" ");
@@ -250,7 +250,7 @@ function Field({
 }) {
   const Wrapper = group ? "div" : "label";
   return (
-    <Wrapper className="block">
+    <Wrapper className="block min-w-0">
       <span className="mb-1 block text-xs text-gray-500">{label}</span>
       {children}
       {/* エラーは画面上部ではなく、該当する欄の直下に出す */}

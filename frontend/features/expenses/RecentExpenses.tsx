@@ -53,9 +53,9 @@ export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
         <EmptyMessage state={state} lastPage={lastPage} />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-xs text-gray-500">
+          <div className="overflow-hidden rounded-lg border border-gray-200">
+            <table className="block w-full text-sm sm:table">
+              <thead className="hidden bg-gray-50 text-xs text-gray-500 sm:table-header-group">
                 <tr>
                   <th className="px-3 py-2 text-left font-medium">日付</th>
                   <th className="px-3 py-2 text-left font-medium">カテゴリ</th>
@@ -66,7 +66,7 @@ export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
                   <th className="px-3 py-2 text-left font-medium">操作</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="block divide-y divide-gray-100 sm:table-row-group">
                 {list.items.map((e) => (
                   <ExpenseRow key={e.id} expense={e} categories={categories} />
                 ))}
