@@ -49,6 +49,7 @@ from app.db.session import SessionLocal, engine  # noqa: E402
 # TRUNCATE 対象（users は seed マイグレーションで入るので残す）
 _TRUNCATE_TABLES = (
     "events",
+    "login_throttles",
     "paypay_import_staging",
     "expenses",
     "monthly_settlements",

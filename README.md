@@ -30,7 +30,7 @@
 | Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | 完了（PayPay 一括判定を含む） |
 | Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 進行中（認証・自動締め・テスト基盤・mypyは完了。ユーザー設定は未着手） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
-| Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
+| Phase 7 | デプロイ | 進行中（Vercel + Neon向け設定とサーバーレス対応を追加） |
 | v2 | MCP 経由の PayPay カテゴリ分類提案 | 構想中（確定操作は人間が行う） |
 
 ブラウザで **`http://localhost:3000`** を開くと3画面（ホーム／支出／PayPay 取り込み）が使える。
@@ -187,6 +187,7 @@ uv run mypy app              # バックエンドの型検査
 | [`PHASE2_PLAN.md`](PHASE2_PLAN.md) | **Phase 2（DB）の構築手順と実行ログ**。Podman / Alembic のハマりどころ付き |
 | [`PHASE3_PLAN.md`](PHASE3_PLAN.md) | **Phase 3（API）の実装手順と実行ログ**。E2E 検証結果とハマりどころ付き |
 | [`PHASE4_PLAN.md`](PHASE4_PLAN.md) | **Phase 4（フロント）の実行計画**。Next.js 16 の作法（Server Actions / キャッシュ）と画面ごとのサーバー・クライアント振り分け |
+| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Vercel + Neonの構成、環境変数、データ移行、リリース確認手順 |
 | [`mockups/`](mockups/) | Phase 4 時点のUIモック（ワイヤーフレーム）。現在は情報設計をホーム／支出／PayPay 取り込みへ更新済み。加えて Phase 5 用のログイン画面 |
 | [`slides/`](slides/) | 勉強会（Phase 4 前半）の発表資料。`phase4_frontend.pptx` と全文テキスト版 `phase4_frontend_text.md` |
 

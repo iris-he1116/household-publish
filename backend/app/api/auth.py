@@ -30,7 +30,7 @@ def login(session: SessionDep, response: Response, data: LoginRequest):
     ログイン認証だけが防御になる。総当たりを止められないと守りにならない。
     """
     # ロック中はパスワードの検証すらしない
-    wait = guard.seconds_until_unlock(data.username)
+    wait = guard.seconds_until_unlock(session, data.username)
     if wait > 0:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -41,13 +41,15 @@ def login(session: SessionDep, response: Response, data: LoginRequest):
     try:
         user = auth_svc.authenticate(session, data.username, data.password)
     except auth_svc.AuthError:
-        guard.record_failure(data.username)
+        guard.record_failure(session, data.username)
+        # HTTPException で処理を終える前に、失敗回数だけは確実に永続化する。
+        session.commit()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="ユーザー名またはパスワードが違います",
         ) from None
 
-    guard.reset(data.username)
+    guard.reset(session, data.username)
 
     set_session_cookie(response, auth_svc.issue_token(user.id))
     write_event(

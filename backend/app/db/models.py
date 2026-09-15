@@ -67,7 +67,32 @@ class User(Base):
 
 
 # ============================================================
-# 2. Category（カテゴリマスタ：食費／日用品／娯楽 等）
+# 2. LoginThrottle（ログイン失敗回数。サーバーレス環境でも共有する）
+# ============================================================
+class LoginThrottle(Base):
+    __tablename__ = "login_throttles"
+
+    # 存在しないユーザー名への試行も数えるため、User への FK は張らない。
+    username: Mapped[str] = mapped_column(String(50), primary_key=True)
+    failure_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="0"
+    )
+    window_started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    locked_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+# ============================================================
+# 3. Category（カテゴリマスタ：食費／日用品／娯楽 等）
 # ============================================================
 class Category(Base):
     __tablename__ = "categories"
@@ -89,7 +114,7 @@ class Category(Base):
 
 
 # ============================================================
-# 3. Expense（共有支出レコード）
+# 4. Expense（共有支出レコード）
 # ============================================================
 class Expense(Base):
     __tablename__ = "expenses"
@@ -152,7 +177,7 @@ class Expense(Base):
 
 
 # ============================================================
-# 4. MonthlySettlement（月次清算の状態）
+# 5. MonthlySettlement（月次清算の状態）
 #   FK なしの独立テーブル。year_month が PK。
 # ============================================================
 class MonthlySettlement(Base):
@@ -197,7 +222,7 @@ class MonthlySettlement(Base):
 
 
 # ============================================================
-# 5. PayPayImportStaging（PayPay CSV 取り込みの一時領域）
+# 6. PayPayImportStaging（PayPay CSV 取り込みの一時領域）
 # ============================================================
 class PayPayImportStaging(Base):
     __tablename__ = "paypay_import_staging"
@@ -252,7 +277,7 @@ class PayPayImportStaging(Base):
 
 
 # ============================================================
-# 6. Event（追記専用ログ：ビジネスイベントの記録）
+# 7. Event（追記専用ログ：ビジネスイベントの記録）
 # ============================================================
 class Event(Base):
     __tablename__ = "events"

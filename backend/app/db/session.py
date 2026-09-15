@@ -3,20 +3,28 @@
 api/deps.py の `get_db_session` から使う。
 """
 from collections.abc import Iterator
+import os
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
 
 
-engine = create_engine(
-    settings.database_url,
+engine_options: dict[str, object] = {
     # pool_pre_ping: 接続が生きているか毎回チェック（コンテナ再起動で切れた接続を検出）
-    pool_pre_ping=True,
+    "pool_pre_ping": True,
     # echo: True にすると SQL を全部ログ出力（デバッグ用、普段は False）
-    echo=False,
-)
+    "echo": False,
+}
+
+# Vercel では Function インスタンスごとの接続プールを持たず、Neon の pooled
+# connection string 側に集約する。ローカルでは通常の QueuePool を維持する。
+if os.environ.get("VERCEL"):
+    engine_options["poolclass"] = NullPool
+
+engine = create_engine(settings.database_url, **engine_options)
 
 SessionLocal = sessionmaker(
     bind=engine,
