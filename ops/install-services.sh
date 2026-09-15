@@ -1,6 +1,10 @@
 #!/bin/bash
 # 家計清算アプリを「Mac にログインしたら自動で立ち上がる」状態にする。
 #
+#   backend  … FastAPI（常駐）
+#   frontend … Next.js（常駐）
+#   backup   … DB のバックアップ（毎日 3:00）
+#
 #   ./ops/install-services.sh          登録して起動
 #   ./ops/install-services.sh uninstall 解除して停止
 #
@@ -9,7 +13,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 AGENTS="$HOME/Library/LaunchAgents"
-SERVICES=(backend frontend)
+SERVICES=(backend frontend backup)
 
 uninstall() {
   for s in "${SERVICES[@]}"; do
@@ -24,15 +28,35 @@ uninstall() {
 }
 
 install() {
+  local failed=0
   mkdir -p "$AGENTS" "$REPO/ops/logs"
   for s in "${SERVICES[@]}"; do
     label="com.household.$s"
-    # 既に動いていれば一度外す（設定を入れ替えるため）
-    launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
+    # 既に動いていれば一度外す（設定を入れ替えるため）。
+    # bootout は非同期なので、実際に消えるまで待つ。
+    # 待たずに bootstrap すると "Bootstrap failed: 5: Input/output error" になる。
+    if launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1; then
+      launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
+      for _ in $(seq 1 20); do
+        launchctl print "gui/$(id -u)/$label" >/dev/null 2>&1 || break
+        sleep 0.5
+      done
+    fi
+
     cp "$REPO/ops/launchd/$label.plist" "$AGENTS/$label.plist"
-    launchctl bootstrap "gui/$(id -u)" "$AGENTS/$label.plist"
-    echo "  登録: $label"
+    if launchctl bootstrap "gui/$(id -u)" "$AGENTS/$label.plist" 2>/dev/null; then
+      echo "  登録: $label"
+    else
+      echo "  ⚠️  登録に失敗: $label（既に読み込まれている可能性）" >&2
+      failed=1
+    fi
   done
+  if [ "$failed" -ne 0 ]; then
+    echo ""
+    echo "一部の登録に失敗しました。もう一度実行してください。" >&2
+    return 1
+  fi
+
   echo ""
   echo "✓ 登録しました。Mac にログインすると自動で起動します。"
   echo "  状態を見る : launchctl list | grep household"

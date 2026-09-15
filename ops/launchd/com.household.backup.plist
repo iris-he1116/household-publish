@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DB のバックアップを毎日1回取る。
+
+  置き場所: ~/Library/LaunchAgents/com.household.backup.plist
+
+  毎日 3:00 に実行。Mac が寝ていた場合は、起きた直後に1回動く
+  （launchd は StartCalendarInterval の取りこぼしを次回起動時に実行する）。
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.household.backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/sibei.he/alice_work/ops/backup-db.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/sibei.he/alice_work</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/sibei.he/alice_work/ops/logs/backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/sibei.he/alice_work/ops/logs/backup.error.log</string>
+</dict>
+</plist>
