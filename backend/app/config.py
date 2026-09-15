@@ -4,7 +4,7 @@
 """
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,6 +20,15 @@ class Settings(BaseSettings):
 
     # DB 接続 URL（例: postgresql+psycopg://user:pw@localhost:5432/household）
     database_url: str = Field(alias="DATABASE_URL")
+
+    @field_validator("database_url")
+    @classmethod
+    def use_psycopg3_driver(cls, value: str) -> str:
+        """Neon等の標準URLを、同梱しているpsycopg 3向けに正規化する。"""
+
+        if value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+psycopg://", 1)
+        return value
 
     # ログレベル（DEBUG / INFO / WARNING / ERROR）
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
