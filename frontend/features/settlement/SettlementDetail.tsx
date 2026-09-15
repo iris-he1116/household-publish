@@ -42,13 +42,6 @@ const STATUS: Record<
   },
 };
 
-const METHOD_LABEL: Record<string, string> = {
-  cash: "現金",
-  credit_card: "クレジットカード",
-  paypay: "PayPay",
-  wechatpay: "WeChat Pay",
-};
-
 /** ISO 文字列を "MM-DD HH:mm" にする。 */
 function shortTime(iso: string | null): string {
   if (!iso) return "";
@@ -199,69 +192,6 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
               />
             )}
           </div>
-        </div>
-
-        {/* 補足の内訳も外枠を増やさず、精算ブロックの最下段に収める */}
-        <div className="grid divide-y divide-gray-100 border-t border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-          <section className="p-5">
-            <h2 className="text-sm font-semibold text-gray-900">
-              カテゴリ別内訳
-            </h2>
-          {s.categories.length === 0 ? (
-            <p className="mt-2 text-sm text-gray-400">—</p>
-          ) : (
-            <ul className="mt-3 space-y-2">
-              {s.categories.map((c) => {
-                const pct =
-                  s.total_amount > 0
-                    ? Math.round((c.amount / s.total_amount) * 100)
-                    : 0;
-                return (
-                  <li key={c.category_id} className="text-sm">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-gray-700">{c.category_name}</span>
-                      <span className="tabular-nums text-gray-900">
-                        {yen(c.amount)}
-                        <span className="ml-1.5 text-xs text-gray-400">
-                          {c.count}件
-                        </span>
-                      </span>
-                    </div>
-                    <div className="mt-1 h-1.5 w-full rounded-full bg-gray-100">
-                      <div
-                        className="h-1.5 rounded-full bg-blue-500"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          </section>
-
-          <section className="p-5">
-            <h2 className="text-sm font-semibold text-gray-900">支払い手段</h2>
-          {s.payment_methods.length === 0 ? (
-            <p className="mt-2 text-sm text-gray-400">—</p>
-          ) : (
-            <ul className="mt-3 space-y-1.5">
-              {s.payment_methods.map((m) => (
-                <li
-                  key={m.payment_method}
-                  className="flex justify-between text-sm"
-                >
-                  <span className="text-gray-700">
-                    {METHOD_LABEL[m.payment_method] ?? m.payment_method}
-                  </span>
-                  <span className="tabular-nums text-gray-900">
-                    {yen(m.amount)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-          </section>
         </div>
       </section>
     </div>

@@ -12,16 +12,17 @@
  */
 import Link from "next/link";
 
+import { ExpenseBreakdown } from "./ExpenseBreakdown";
 import { ExpenseFilters } from "./ExpenseFilters";
 import { ExpenseRow } from "./ExpenseRow";
 import { buildHref, PAGE_SIZE, type ExpenseQueryState } from "./query";
-import { getCategories, getExpenses } from "@/lib/api";
+import { getCategories, getExpenses, getSummary } from "@/lib/api";
 
 const yen = (n: number) => `¥${n.toLocaleString("ja-JP")}`;
 
 export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
-  // 2つの API を並行して呼ぶ（順番に await すると直列になり遅くなる）
-  const [list, categories] = await Promise.all([
+  // 一覧・カテゴリ・月次集計を並行して呼ぶ（直列に待たせない）
+  const [list, categories, summary] = await Promise.all([
     getExpenses({
       yearMonth: state.yearMonth,
       categoryId: state.categoryId,
@@ -31,6 +32,7 @@ export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
       offset: (state.page - 1) * PAGE_SIZE,
     }),
     getCategories(),
+    getSummary(state.yearMonth),
   ]);
 
   // total は「絞り込み後の全件数」。1ページ分の items.length ではない。
@@ -39,13 +41,15 @@ export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
   const lastIndex = firstIndex + list.items.length - 1;
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="text-2xl font-bold text-gray-900">支出一覧</h1>
         <p className="text-xs text-gray-500">
           全 {list.total} 件 / 合計 {yen(list.total_amount)}
         </p>
       </div>
+
+      <ExpenseBreakdown summary={summary} categories={categories} />
 
       <ExpenseFilters state={state} categories={categories} />
 
