@@ -41,43 +41,46 @@ cat > "$WORK/README.txt" <<'TXT'
   household.sql  DB 全体のダンプ
   env.txt        .env の中身（パスワードと JWT 鍵を含む）
 
-【移行先の PC でやること】
+【移行先の Mac でやること】
 
-1. リポジトリを clone
-     git clone <リポジトリURL> alice_work
-     cd alice_work
+■ 事前に入れておくもの
 
-2. env.txt を .env として置く
-     cp /path/to/env.txt .env
+    brew install podman uv node
+    pip3 install --user podman-compose
+    podman machine init     # 初回のみ。10分ほどかかる
+    podman machine start
 
-3. Podman をインストールして起動
-     brew install podman
-     podman machine init
-     podman machine start
-     pip3 install --user podman-compose
-     podman-compose up -d
+■ 移行（3ステップ）
 
-4. DB を復元（マイグレーションは実行しない。ダンプに全部入っている）
-     cat household.sql | podman exec -i household_db psql -U household_user -d household
+  1. リポジトリを取得
+       git clone <リポジトリURL> alice_work
+       cd alice_work
 
-5. バックエンドの依存を入れる
-     cd backend && uv sync
+  2. この tar.gz を渡して実行
+       ./ops/setup-new-machine.sh /path/to/migration_YYYYMMDD_HHMMSS.tar.gz
 
-6. フロントの依存を入れてビルド
-     cd ../frontend && npm install && npm run build
+     以下を通しでやります:
+       設定(.env)の復元 → DB コンテナ起動 → DB 復元
+       → 依存の導入 → ビルド → 常時起動の登録
 
-7. 常時起動を登録
-     cd .. && ./ops/install-services.sh
-     ※ plist 内のパス /Users/sibei.he/alice_work を
-       移行先の実際のパスに書き換えてから実行すること
+  3. ブラウザで開く
+       http://localhost:3000/login
+       ユーザー名とパスワードは前の PC と同じ
 
-8. 動作確認
-     http://localhost:3000/login を開いてログイン
+■ 外から使えるようにする（ひつじさんの端末用）
+
+    brew install --cask tailscale
+    → アプリを開いてサインイン
+    → ./ops/setup-funnel.sh
+
+  発行された https://～.ts.net を渡せば、
+  相手はアプリのインストールなしでブラウザから使えます。
 
 【注意】
-  - このフォルダは秘密情報を含む。移行が済んだら消すこと
-  - JWT_SECRET を引き継ぐので、既存のログインはそのまま使える
-    （新しく作りたい場合は openssl rand -base64 48 で作り直す）
+  - このフォルダは DB とパスワードと署名鍵を含みます。
+    USB か AirDrop で運び、移行が済んだら消してください。
+    クラウドストレージやチャットには上げないこと。
+  - JWT_SECRET を引き継ぐので、既存のログインはそのまま使えます。
 TXT
 
 echo "[3/3] まとめています..."

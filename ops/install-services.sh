@@ -43,7 +43,12 @@ install() {
       done
     fi
 
-    cp "$REPO/ops/launchd/$label.plist" "$AGENTS/$label.plist"
+    # テンプレートの __REPO__ を、今いる場所に置き換えて書き出す。
+    # これで別の PC に移しても、パスを手で直す必要がない。
+    sed "s|__REPO__|$REPO|g" "$REPO/ops/launchd/$s.plist.template" > "$AGENTS/$label.plist"
+    plutil -lint "$AGENTS/$label.plist" >/dev/null || {
+      echo "  plist の生成に失敗: $label" >&2; failed=1; continue
+    }
     if launchctl bootstrap "gui/$(id -u)" "$AGENTS/$label.plist" 2>/dev/null; then
       echo "  登録: $label"
     else
