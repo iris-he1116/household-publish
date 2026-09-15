@@ -14,7 +14,7 @@
  *   行き先が押す前から決まっている。ただのリンクなので JavaScript が
  *   動かなくても機能するし、Next.js が事前読み込み（prefetch）してくれる。
  *
- * - カテゴリ / 手段 / 支払者 → `useRouter().replace()`
+ * - 月の直接選択 / カテゴリ / 手段 / 支払者 → `useRouter().replace()`
  *   行き先が「選ばれた値」で決まるので、リンクにするなら選択肢の数だけ
  *   <a> を並べることになる。素直に onChange で遷移させる。
  *   push ではなく replace なのは、絞り込みを3回変えたあとに戻るボタンを
@@ -64,9 +64,15 @@ export function ExpenseFilters({ state, categories }: Props) {
         >
           ◂
         </MonthLink>
-        <span className="px-2 py-1.5 text-sm font-medium tabular-nums text-gray-900">
-          {state.yearMonth}
-        </span>
+        <input
+          type="month"
+          aria-label="表示する月を選択"
+          value={state.yearMonth}
+          onChange={(event) => {
+            if (event.target.value) go({ yearMonth: event.target.value });
+          }}
+          className="min-w-0 flex-1 border-x border-gray-200 bg-white px-2 py-1.5 text-center text-sm font-medium tabular-nums text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400 sm:w-36 sm:flex-none"
+        />
         <MonthLink
           href={buildHref(state, { yearMonth: shiftMonth(state.yearMonth, 1) })}
           label="次の月"
