@@ -40,5 +40,6 @@ class Settings(BaseSettings):
     cookie_secure: bool = Field(default=True, alias="COOKIE_SECURE")
 
 
-# シングルトン
-settings = Settings()
+# シングルトン。値は実行時に環境変数または .env から渡されるため、
+# 静的解析には必須フィールドを引数で渡していないことだけを許容させる。
+settings = Settings()  # type: ignore[call-arg]

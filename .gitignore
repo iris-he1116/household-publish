@@ -1,6 +1,7 @@
 # 環境変数（パスワード等）
 .env
-.env.local
+.env.*
+!.env.example
 
 # Python
 __pycache__/

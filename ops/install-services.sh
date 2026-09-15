@@ -3,7 +3,8 @@
 #
 #   backend  … FastAPI（常駐）
 #   frontend … Next.js（常駐）
-#   backup   … DB のバックアップ（毎日 3:00）
+#   backup       … DB のバックアップ（毎日 3:00）
+#   monthly-close … 月末自動締めの判定（毎日 23:59）
 #
 #   ./ops/install-services.sh          登録して起動
 #   ./ops/install-services.sh uninstall 解除して停止
@@ -13,7 +14,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 AGENTS="$HOME/Library/LaunchAgents"
-SERVICES=(backend frontend backup)
+SERVICES=(backend frontend backup monthly-close)
 
 uninstall() {
   for s in "${SERVICES[@]}"; do

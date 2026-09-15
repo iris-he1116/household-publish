@@ -5,7 +5,7 @@
  *
  * やること   : Cookie が「有るか無いか」だけ見て振り分ける
  * やらないこと: JWT の検証。署名鍵はバックエンドにしか無いし、
- *               middleware は全リクエストで動くので重い処理を置かない
+ *               proxy は全リクエストで動くので重い処理を置かない
  *
  * Cookie を偽造して通り抜けても、API 側が 401 を返すので実害はない。
  * これは「入口の案内」であって「鍵」ではない。鍵は FastAPI 側にある。
@@ -14,7 +14,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const SESSION_COOKIE = "household_session";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const hasSession = request.cookies.has(SESSION_COOKIE);
 

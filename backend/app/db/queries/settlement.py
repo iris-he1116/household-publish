@@ -58,16 +58,17 @@ def compute_totals(
     ).one()
 
     # ユーザー別立替（2人固定: id=1 が A、id=2 が B）
-    per_user = dict(
-        session.execute(
+    per_user: dict[int, int] = {
+        user_id: int(amount)
+        for user_id, amount in session.execute(
             select(
                 Expense.paid_by,
                 func.coalesce(func.sum(Expense.amount), 0),
             )
             .where(*base_filter)
             .group_by(Expense.paid_by)
-        ).all()
-    )
+        ).tuples()
+    }
     user_a_paid = int(per_user.get(1, 0))
     user_b_paid = int(per_user.get(2, 0))
 

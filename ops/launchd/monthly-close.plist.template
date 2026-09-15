@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  月末自動締めの判定を毎日 23:59 に実行する。
+
+  月末以外は前月が未締めなら締めるため、Mac が月末にスリープしていても
+  起動後の補完実行で取りこぼさない。
+
+  ★ これはテンプレート。__REPO__ は install-services.sh が置き換える。
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.household.monthly-close</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/ops/run-monthly-close.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__REPO__</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>23</integer>
+        <key>Minute</key>
+        <integer>59</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>__REPO__/ops/logs/monthly-close.log</string>
+    <key>StandardErrorPath</key>
+    <string>__REPO__/ops/logs/monthly-close.error.log</string>
+</dict>
+</plist>

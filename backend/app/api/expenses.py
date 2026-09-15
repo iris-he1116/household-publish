@@ -11,7 +11,6 @@ from app.api.schemas.expense import (
 from app.db.queries import expense as q
 from app.services import expense as svc
 
-
 router = APIRouter(
     prefix="/api/expenses", tags=["expenses"],
     # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
@@ -49,7 +48,11 @@ def list_(
         paid_by=paid_by,
         payment_method=payment_method,
     )
-    return ExpenseListResponse(items=items, total=total, total_amount=total_amount)
+    return ExpenseListResponse(
+        items=[ExpenseRead.model_validate(item) for item in items],
+        total=total,
+        total_amount=total_amount,
+    )
 
 
 @router.post("/", response_model=ExpenseRead, status_code=status.HTTP_201_CREATED)

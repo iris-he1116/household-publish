@@ -27,8 +27,8 @@
 | Phase 1 | 設計（ドメイン / アーキテクチャ / データモデル / UI モック） | 完了 |
 | Phase 2 | DB 基盤（PostgreSQL コンテナ / SQLAlchemy モデル / Alembic） | 完了 |
 | Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了（AI 連携は不要と判断して見送り → [DESIGN.md §1.8](DESIGN.md)） |
-| Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | **前半完了**（後半は未着手） |
-| Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 一部着手（テスト基盤のみ） |
+| Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | 完了 |
+| Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 進行中（認証・自動締め・テスト基盤・mypyは完了。ユーザー設定は未着手） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
 | Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
 
@@ -52,6 +52,8 @@ cp .env.example .env
 - `POSTGRES_PASSWORD` — DB のパスワード（好きな文字列）
 - `DATABASE_URL` — 上と同じパスワードを埋める
 - `ALICE_PASSWORD` / `HITSUJI_PASSWORD` — 初期ユーザー2人のログインパスワード（seed マイグレーションで bcrypt ハッシュ化して投入される）
+- `JWT_SECRET` — JWT の署名鍵（32文字以上）
+- `COOKIE_SECURE` — localhost の HTTP で試すときは `false`、Tailscale の HTTPS 公開時は `true`
 
 ランダム生成する場合：
 
@@ -115,19 +117,26 @@ npm run dev
 
 ```
 API_BASE_URL=http://127.0.0.1:8000
-API_USER_ID=1
 ```
-
-`API_USER_ID` は認証ができるまでの暫定。`1` = ありす／`2` = ひつじ。
 
 ### 9. ブラウザで開く
 
-<http://localhost:3000>
+<http://localhost:3000/login>
 
 3画面（ホーム／月次清算／PayPay 取り込み）が使える。
 
-API 単体を試したいときは Swagger UI（<http://localhost:8000/docs>）。認証は Phase 5 実装予定のため、
-リクエストヘッダ `X-User-Id`（`1` = ありす／`2` = ひつじ／省略時は `1`）でユーザーを切り替える。
+API 単体を試したいときは Swagger UI（<http://localhost:8000/docs>）。最初に
+`POST /api/auth/login` でログインすると、以降の認証必須 API を試せる。
+
+### 10. 自動起動・バックアップ・月末自動締め（任意）
+
+```bash
+./ops/install-services.sh
+```
+
+バックエンドとフロントエンドの自動起動、毎日 3:00 の DB バックアップ、毎日 23:59 の
+月末自動締め判定を macOS の launchd に登録する。Mac が月末にスリープしていた場合も、
+次回の補完実行で前月を締める。解除は `./ops/install-services.sh uninstall`。
 
 ---
 
@@ -154,6 +163,7 @@ uv sync --extra dev          # 初回のみ（pytest 等を入れる）
 uv run pytest                # 全テスト
 uv run pytest tests/unit/    # 純関数のみ（DB 不要・高速）
 uv run pytest -v             # 各テスト名を表示
+uv run mypy app              # バックエンドの型検査
 ```
 
 - **`tests/unit/`** — DB を触らない純関数のテスト。**コンテナが停止していても走る**（実測 0.01 秒）
