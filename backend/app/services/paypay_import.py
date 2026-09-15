@@ -35,8 +35,7 @@ commit はこの関数の末尾で1回だけ行う。
 """
 import csv
 import io
-from datetime import date, datetime
-from typing import Iterator
+from datetime import UTC, date, datetime
 
 from sqlalchemy.orm import Session
 
@@ -44,7 +43,6 @@ from app.db.models import PayPayImportStaging, User
 from app.db.queries import paypay_import as q
 from app.services import expense as expense_svc
 from app.services.events import write_event
-
 
 # --- CSV の列名（PayPay の出力に合わせる。変わったらここだけ直す） ---
 _COL_DATE = "取引日"
@@ -90,7 +88,7 @@ def parse_occurred_on(raw: str) -> date:
     text = raw.strip()
     for fmt in ("%Y/%m/%d %H:%M:%S", "%Y/%m/%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
         try:
-            return datetime.strptime(text, fmt).date()
+            return datetime.strptime(text, fmt).date()  # noqa: DTZ007
         except ValueError:
             continue
     raise ValueError(f"取引日を解釈できません: {raw!r}")
@@ -166,7 +164,12 @@ def _parse_csv(text: str, imported_by: int, imported_at: datetime) -> list[dict]
             "merchant_name": merchant if merchant and merchant != _EMPTY else None,
             "paypay_txn_id": txn_id,
             "status": "pending",
-            "raw_row": {k: (v or "") for k, v in row.items()},
+            "raw_row": {
+                **{k: (v or "") for k, v in row.items()},
+                "_source_type": "paypay",
+                "_source_label": "PayPay",
+                "_payment_method": "paypay",
+            },
         })
     return rows
 
@@ -175,7 +178,7 @@ def import_csv(
     session: Session, user: User, csv_text: str
 ) -> dict:
     """CSV をパースしてステージングに INSERT。重複は自動除外。"""
-    imported_at = datetime.now()
+    imported_at = datetime.now(UTC)
     csv_line_count = max(sum(1 for _ in io.StringIO(csv_text)) - 1, 0)  # ヘッダを除く
     rows = _parse_csv(csv_text, imported_by=user.id, imported_at=imported_at)
     total = len(rows)
@@ -197,10 +200,64 @@ def import_csv(
     )
     session.commit()
     return {
+        "source_type": "paypay",
+        "source_label": "PayPay",
         "total_rows": total,
         "new_rows": inserted,
         "duplicate_rows": duplicates,
         "skipped_rows": skipped,
+    }
+
+
+def import_pdf(session: Session, user: User, content: bytes) -> dict:
+    """対応する明細PDFをステージングへ取り込む。"""
+    # 循環 import を避ける。statement_pdf は PayPay の金額パーサだけを再利用する。
+    from app.services.statement_pdf import parse_statement_pdf
+
+    statement = parse_statement_pdf(content)
+    imported_at = datetime.now(UTC)
+    rows = [
+        {
+            "imported_by": user.id,
+            "imported_at": imported_at,
+            "occurred_on": item.occurred_on,
+            "amount": item.amount,
+            "merchant_name": item.merchant_name,
+            # 既存列名はDB移行を避けるため維持。値は取込元を含む汎用キー。
+            "paypay_txn_id": item.source_key,
+            "status": "pending",
+            "raw_row": {
+                **item.raw_row,
+                "_source_type": item.source_type,
+                "_source_label": item.source_label,
+                "_payment_method": item.payment_method,
+            },
+        }
+        for item in statement.rows
+    ]
+    inserted, duplicates = q.bulk_insert_ignore_duplicates(session, rows)
+    write_event(
+        session,
+        event_type="statement.pdf_imported",
+        actor=user,
+        entity_type="statement_staging",
+        entity_id="batch",
+        payload={
+            "source_type": statement.source_type,
+            "row_count": len(rows),
+            "new_count": inserted,
+            "duplicate_count": duplicates,
+            "skipped_count": statement.skipped_rows,
+        },
+    )
+    session.commit()
+    return {
+        "source_type": statement.source_type,
+        "source_label": statement.source_label,
+        "total_rows": len(rows),
+        "new_rows": inserted,
+        "duplicate_rows": duplicates,
+        "skipped_rows": statement.skipped_rows,
     }
 
 
@@ -246,7 +303,7 @@ def _adopt_core(
         amount=staging.amount,
         occurred_on=staging.occurred_on,
         category_id=category_id,
-        payment_method="paypay",
+        payment_method=str(staging.raw_row.get("_payment_method") or "paypay"),
         note=note or staging.merchant_name,
         paid_by=user.id,
         source_staging_id=staging.id,

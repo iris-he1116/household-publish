@@ -21,6 +21,7 @@ dependencies = [
     "structlog>=24.4",
     "python-multipart>=0.0.20",  # ファイルアップロード（PayPay CSV）用
     "pyjwt>=2.10",
+    "pdfplumber>=0.11,<0.12",  # デジタル発行されたカード・銀行明細 PDF の表抽出
 ]
 
 [project.optional-dependencies]

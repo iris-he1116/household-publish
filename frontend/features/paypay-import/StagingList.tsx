@@ -34,7 +34,7 @@ export async function StagingList() {
 
       {rows.length === 0 ? (
         <p className="rounded-lg border border-dashed border-gray-300 p-8 text-center text-sm text-gray-400">
-          未判定の行はありません。CSV を取り込むとここに並びます。
+          未判定の行はありません。明細ファイルを取り込むとここに並びます。
         </p>
       ) : (
         <>

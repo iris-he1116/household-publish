@@ -120,6 +120,39 @@ def test_adoptに成功すると支出が1件だけ作られてstagingがadopted
     assert event_types == {"expense.created", "paypay.row_adopted"}
 
 
+def test_銀行明細は口座引落として支出になる(
+    session: Session,
+    alice: User,
+    category: Category,
+):
+    row = PayPayImportStaging(
+        imported_by=alice.id,
+        imported_at=datetime(2026, 8, 4, 10, 0),
+        occurred_on=date(2026, 8, 2),
+        amount=4200,
+        merchant_name="電気料金",
+        paypay_txn_id="mufg:test-bank-row",
+        status="pending",
+        raw_row={
+            "取引内容": "電気料金",
+            "_source_type": "mufg",
+            "_source_label": "三菱UFJ銀行",
+            "_payment_method": "bank_account",
+        },
+    )
+    session.add(row)
+    session.commit()
+
+    adopted = svc.adopt(
+        session, alice, row, category_id=category.id, note=None
+    )
+    expense = session.get(Expense, adopted.linked_expense_id)
+
+    assert expense is not None
+    assert expense.payment_method == "bank_account"
+    assert expense.note == "電気料金"
+
+
 def test_noteを省略すると店舗名がnoteになる(
     session: Session,
     alice: User,

@@ -83,7 +83,7 @@ export async function ProcessedHistory() {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold text-gray-900">判定済みの履歴</h2>
         <p className="text-xs text-gray-500">
-          取引番号で重複を判定しているので、同じ取引は二重に登録されません
+          取引情報で重複を判定しているので、同じ明細は二重に登録されません
         </p>
       </div>
 
@@ -127,6 +127,9 @@ export async function ProcessedHistory() {
                   </span>
                   <span className="min-w-0 flex-1 truncate text-gray-900">
                     {r.merchant_name ?? "（店舗名なし）"}
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">
+                    {r.source_label ?? "PayPay"}
                   </span>
                   <span className="tabular-nums text-gray-900">
                     {yen(r.amount)}

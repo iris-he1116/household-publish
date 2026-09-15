@@ -1,9 +1,9 @@
 /**
- * PayPay 取り込みの Server Action。
+ * 明細取り込みの Server Action。
  *
  * ★ サーバーでだけ動く（'use server'）★
  *
- * CSV ファイルの中身がブラウザから Next.js サーバーに渡り、
+ * 明細ファイルの中身がブラウザから Next.js サーバーに渡り、
  * そこから FastAPI に転送される。ブラウザは FastAPI を直接叩かない。
  */
 "use server";
@@ -44,33 +44,33 @@ function toMessage(error: unknown, verb: string): string {
     return "対象の行が見つかりませんでした。画面を再読み込みしてください。";
   }
   if (error.status === 422) {
-    return "CSV の形式が想定と違います。列（取引日 / 金額 / 店舗名 / 取引ID）を確認してください。";
+    return "明細ファイルの形式を確認してください。対応形式は PayPay CSV・三井住友カード PDF・三菱UFJ銀行 PDF です。";
   }
   const id = error.requestId ? `（ID: ${error.requestId}）` : "";
   return `エラーが発生しました${id}`;
 }
 
 // ============================================================
-// CSV アップロード
+// 明細ファイルのアップロード
 // ============================================================
 
 /**
- * PayPay の履歴 CSV を取り込む。
+ * 対応するCSVまたはPDF明細を取り込む。
  *
  * ここだけ multipart/form-data なので、JSON 用の `apiPost` ではなく
  * `fetch` を直接使う（Content-Type はブラウザ側の境界文字列が必要なので指定しない）。
  */
-export async function importCsv(
+export async function importStatement(
   _prevState: ImportState,
   formData: FormData,
 ): Promise<ImportState> {
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, message: "CSV ファイルを選んでください。", result: null };
+    return { ok: false, message: "明細ファイルを選んでください。", result: null };
   }
-  if (!file.name.toLowerCase().endsWith(".csv")) {
-    return { ok: false, message: "CSV ファイル（.csv）を選んでください。", result: null };
+  if (!/\.(csv|pdf)$/i.test(file.name)) {
+    return { ok: false, message: "CSV または PDF ファイルを選んでください。", result: null };
   }
 
   const upstream = new FormData();
@@ -83,7 +83,7 @@ export async function importCsv(
     const session = jar.get(SESSION_COOKIE)?.value;
 
     const res = await fetch(
-      `${process.env.API_BASE_URL ?? "http://127.0.0.1:8000"}/api/paypay-import/csv`,
+      `${process.env.API_BASE_URL ?? "http://127.0.0.1:8000"}/api/paypay-import/file`,
       {
         method: "POST",
         // Content-Type は指定しない。FormData を渡すと境界文字列付きで自動設定される。
@@ -111,7 +111,7 @@ export async function importCsv(
       message:
         result.new_rows === 0
           ? "新しい行はありませんでした（すべて取り込み済み）。"
-          : `${result.new_rows} 件を取り込みました。`,
+          : `${result.source_label}から ${result.new_rows} 件を取り込みました。`,
       result,
     };
   } catch (error) {

@@ -1,6 +1,5 @@
 """PayPay インポート API のスキーマ。"""
 from datetime import date, datetime
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -15,6 +14,8 @@ class StagingRowRead(BaseModel):
     amount: int
     merchant_name: str | None
     paypay_txn_id: str
+    source_type: str
+    source_label: str
     status: str
     linked_expense_id: int | None
 
@@ -27,7 +28,9 @@ class CsvImportResult(BaseModel):
     それらは支出ではないので取り込む前に落としている（`skipped_rows`）。
     """
 
-    total_rows: int = Field(description="取り込み対象になった行数（支払いのみ）")
+    source_type: str = "paypay"
+    source_label: str = "PayPay"
+    total_rows: int = Field(description="取り込み対象になった行数")
     new_rows: int = Field(description="新規に登録した行数")
     duplicate_rows: int = Field(description="取引番号が既にあり除外した行数")
     skipped_rows: int = Field(

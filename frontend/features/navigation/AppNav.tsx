@@ -1,5 +1,5 @@
 /**
- * 3つの役割（精算 / 支出管理 / PayPay 取込）を行き来するナビゲーション。
+ * 3つの役割（精算 / 支出管理 / 明細取込）を行き来するナビゲーション。
  *
  * ★ クライアントコンポーネント ★
  *
@@ -42,7 +42,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/paypay-import",
-    label: "PayPay",
+    label: "明細取込",
     icon: "📥",
     match: (p) => p.startsWith("/paypay-import"),
   },

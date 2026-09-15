@@ -14,6 +14,14 @@ const INITIAL_STATE: BatchActionState = {
 
 const yen = (amount: number) => `¥ ${amount.toLocaleString("ja-JP")}`;
 
+function SourceBadge({ label }: { label: string }) {
+  return (
+    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">
+      {label}
+    </span>
+  );
+}
+
 export function BulkStagingList({
   rows,
   categories,
@@ -171,13 +179,15 @@ export function BulkStagingList({
                   aria-label={`${row.merchant_name ?? "店舗名なし"}を選択`}
                   className="size-4 accent-blue-700"
                 />
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <p className="min-w-0 truncate text-sm font-semibold text-gray-900">
                     {row.merchant_name ?? "（店舗名なし）"}
-                  </p>
+                    </p>
+                    <SourceBadge label={row.source_label ?? "PayPay"} />
+                  </div>
                   <p className="mt-0.5 text-xs text-gray-500">
                     {row.occurred_on}
-                    <span className="ml-2 text-gray-400">{row.paypay_txn_id}</span>
                   </p>
                 </div>
                 <p className="text-right text-sm font-bold tabular-nums text-gray-900">

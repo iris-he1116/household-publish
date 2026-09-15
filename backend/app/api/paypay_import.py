@@ -1,4 +1,6 @@
 """PayPay インポート API のルーター。"""
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.api.deps import CurrentUserDep, SessionDep, get_current_user
@@ -14,7 +16,6 @@ from app.api.schemas.paypay_import import (
 from app.db.queries import paypay_import as q
 from app.services import paypay_import as svc
 
-
 router = APIRouter(
     prefix="/api/paypay-import", tags=["paypay_import"],
     # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
@@ -22,9 +23,37 @@ router = APIRouter(
 )
 
 
+@router.post("/file", response_model=CsvImportResult, status_code=status.HTTP_201_CREATED)
+async def upload_statement_file(
+    session: SessionDep,
+    user: CurrentUserDep,
+    file: Annotated[UploadFile, File()],
+):
+    """PayPay CSV または対応するカード・銀行明細PDFを取り込む。"""
+    content = await file.read()
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="ファイルは10MB以下にしてください")
+    filename = (file.filename or "").lower()
+    if filename.endswith(".pdf"):
+        try:
+            return svc.import_pdf(session, user, content)
+        except ValueError as exc:
+            session.rollback()
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if not filename.endswith(".csv"):
+        raise HTTPException(status_code=400, detail="CSVまたはPDFファイルを選んでください")
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("cp932")
+    return svc.import_csv(session, user, text)
+
+
 @router.post("/csv", response_model=CsvImportResult, status_code=status.HTTP_201_CREATED)
 async def upload_csv(
-    session: SessionDep, user: CurrentUserDep, file: UploadFile = File(...)
+    session: SessionDep,
+    user: CurrentUserDep,
+    file: Annotated[UploadFile, File()],
 ):
     """自分の PayPay 履歴 CSV をアップロード。
 

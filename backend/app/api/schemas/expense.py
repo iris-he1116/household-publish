@@ -4,8 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-PaymentMethod = Literal["cash", "credit_card", "paypay", "wechatpay"]
+PaymentMethod = Literal["cash", "credit_card", "paypay", "wechatpay", "bank_account"]
 
 
 class ExpenseCreate(BaseModel):

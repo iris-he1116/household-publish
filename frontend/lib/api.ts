@@ -184,7 +184,7 @@ export type Category = {
 };
 
 /**
- * PayPay 履歴の取り込み行（共有判定の前後）。
+ * 決済・口座明細の取り込み行（共有判定の前後）。
  *
  * DESIGN.md §2.6: CSV を取り込むと pending で入り、
  * 「共有」と判定すると adopted になって Expense に昇格する。
@@ -197,15 +197,20 @@ export type StagingRow = {
   amount: number;
   merchant_name: string | null;
   paypay_txn_id: string;
+  source_type: "paypay" | "smcc" | "mufg";
+  source_label: string;
   status: "pending" | "adopted" | "excluded";
   linked_expense_id: number | null;
 };
 
 /** CSV アップロードの結果。 */
 export type CsvImportResult = {
+  source_type: "paypay" | "smcc" | "mufg";
+  source_label: string;
   total_rows: number;
   new_rows: number;
   duplicate_rows: number;
+  skipped_rows: number;
 };
 
 /** PayPay の一括判定結果。 */
@@ -270,7 +275,7 @@ export const getSettlements = () =>
   apiGet<Settlement[]>(`/api/settlements/`);
 
 /**
- * PayPay 取り込みのステージング行を取る。
+ * 明細取り込みのステージング行を取る。
  *
  * `only_mine=true`（既定）だと、サーバーがログイン中のユーザーを見て
  * 自分がアップロードした分だけを返す。相手の履歴は見えない。

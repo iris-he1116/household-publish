@@ -15,6 +15,7 @@ export const PAYMENT_METHODS = [
   { value: "credit_card", label: "クレカ" },
   { value: "paypay", label: "PayPay" },
   { value: "wechatpay", label: "WeChat Pay" },
+  { value: "bank_account", label: "口座引落" },
 ] as const;
 
 /** 支払者。Phase 5 で users テーブルから引くようになるまでの固定値。 */

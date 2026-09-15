@@ -166,7 +166,7 @@ class Expense(Base):
         # 名前は短く。naming_convention が "ck_expenses_" を自動で付ける。
         CheckConstraint("amount > 0", name="amount_positive"),
         CheckConstraint(
-            "payment_method IN ('cash', 'credit_card', 'paypay', 'wechatpay')",
+            "payment_method IN ('cash', 'credit_card', 'paypay', 'wechatpay', 'bank_account')",
             name="payment_method",
         ),
         # 月次集計・支払者集計・カテゴリ集計の高速化
@@ -274,6 +274,14 @@ class PayPayImportStaging(Base):
         Index("ix_paypay_import_staging_imported_by_status", "imported_by", "status"),
         Index("ix_paypay_import_staging_occurred_on", "occurred_on"),
     )
+
+    @property
+    def source_type(self) -> str:
+        return str(self.raw_row.get("_source_type") or "paypay")
+
+    @property
+    def source_label(self) -> str:
+        return str(self.raw_row.get("_source_label") or "PayPay")
 
 
 # ============================================================

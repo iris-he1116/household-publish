@@ -52,7 +52,9 @@ export function StagingCard({
           </p>
           <p className="mt-0.5 text-xs text-gray-500">
             {row.occurred_on}
-            <span className="ml-2 text-gray-400">{row.paypay_txn_id}</span>
+            <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">
+              {row.source_label ?? "PayPay"}
+            </span>
           </p>
         </div>
         <p className="shrink-0 text-lg font-bold tabular-nums text-gray-900">

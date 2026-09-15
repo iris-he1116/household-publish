@@ -1,13 +1,13 @@
 /**
- * PayPay 取り込み画面（モック③ に対応）。
+ * 決済・口座明細の取り込み画面。
  *
  * ★ サーバーコンポーネント（'use client' なし）★
  *
  * DESIGN.md §1.4 / §2.6:
- *   CSV アップロード → ステージングに取り込み（重複は自動除外）
+ *   明細ファイル → ステージングに取り込み（重複は自動除外）
  *   → 1行ずつ「共有 / 個人」を判定 → 共有分だけ支出に昇格
  *
- * PayPay の履歴は各自が自分の分をアップロードする運用なので、
+ * 明細は各自が自分の分をアップロードする運用なので、
  * この画面に出るのは自分が取り込んだ行だけ（サーバーがログイン中のユーザーで絞る）。
  */
 import { Suspense } from "react";
@@ -29,9 +29,9 @@ export default function PayPayImportPage() {
     <main className="mx-auto max-w-3xl px-6 py-8">
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">PayPay 取り込み</h1>
+          <h1 className="text-2xl font-bold text-gray-900">明細取込</h1>
           <p className="mt-1 text-sm text-gray-500">
-            自分の PayPay 履歴 CSV をアップロードして、2人で使った分だけを支出に登録します
+            自分の決済・口座明細を読み込み、2人で使った分だけを支出に登録します
           </p>
         </div>
 
