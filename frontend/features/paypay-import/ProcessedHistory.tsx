@@ -10,6 +10,42 @@ import { getStagingRows, type StagingRow } from "@/lib/api";
 
 const yen = (n: number) => `¥ ${n.toLocaleString("ja-JP")}`;
 
+type MonthGroup = {
+  yearMonth: string;
+  rows: StagingRow[];
+  totalAmount: number;
+  sharedCount: number;
+  personalCount: number;
+};
+
+function groupByMonth(rows: StagingRow[]): MonthGroup[] {
+  const groups = new Map<string, MonthGroup>();
+
+  for (const row of rows) {
+    const yearMonth = row.occurred_on.slice(0, 7);
+    const group = groups.get(yearMonth) ?? {
+      yearMonth,
+      rows: [],
+      totalAmount: 0,
+      sharedCount: 0,
+      personalCount: 0,
+    };
+
+    group.rows.push(row);
+    group.totalAmount += row.amount;
+    if (row.status === "adopted") group.sharedCount += 1;
+    else group.personalCount += 1;
+    groups.set(yearMonth, group);
+  }
+
+  return [...groups.values()];
+}
+
+function monthLabel(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-");
+  return `${year}年${Number(month)}月`;
+}
+
 function Badge({ status }: { status: StagingRow["status"] }) {
   if (status === "adopted") {
     return (
@@ -40,6 +76,8 @@ export async function ProcessedHistory() {
     return null;
   }
 
+  const monthGroups = groupByMonth(rows);
+
   return (
     <section className="rounded-lg border border-gray-200 p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -49,23 +87,62 @@ export async function ProcessedHistory() {
         </p>
       </div>
 
-      <ul className="mt-3 divide-y divide-gray-100">
-        {rows.map((r) => (
-          <li key={r.id} className="flex flex-wrap items-center gap-3 py-2 text-sm">
-            <span className="tabular-nums text-gray-500">{r.occurred_on}</span>
-            <span className="text-gray-900">
-              {r.merchant_name ?? "（店舗名なし）"}
-            </span>
-            <span className="tabular-nums text-gray-900">{yen(r.amount)}</span>
-            <Badge status={r.status} />
-            <span className="text-xs text-gray-500">
-              {r.status === "adopted"
-                ? `→ 支出 #${r.linked_expense_id} として登録済み`
-                : "→ 集計に含めない（記録だけ残す）"}
-            </span>
-          </li>
+      <div className="mt-3 space-y-2">
+        {monthGroups.map((group, index) => (
+          <details
+            key={group.yearMonth}
+            open={index === 0}
+            className="group overflow-hidden rounded-lg border border-gray-200"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-gray-50 px-3 py-3 [&::-webkit-details-marker]:hidden">
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="shrink-0 text-gray-400 transition-transform group-open:rotate-90"
+                >
+                  ▸
+                </span>
+                <span className="font-semibold text-gray-900">
+                  {monthLabel(group.yearMonth)}
+                </span>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-sm font-medium tabular-nums text-gray-900">
+                  {group.rows.length}件・{yen(group.totalAmount)}
+                </p>
+                <p className="text-[11px] text-gray-500">
+                  共有 {group.sharedCount}件 / 個人 {group.personalCount}件
+                </p>
+              </div>
+            </summary>
+
+            <ul className="divide-y divide-gray-100 bg-white">
+              {group.rows.map((r) => (
+                <li
+                  key={r.id}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5 text-sm"
+                >
+                  <span className="tabular-nums text-gray-500">
+                    {r.occurred_on.slice(5).replace("-", "/")}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-gray-900">
+                    {r.merchant_name ?? "（店舗名なし）"}
+                  </span>
+                  <span className="tabular-nums text-gray-900">
+                    {yen(r.amount)}
+                  </span>
+                  <Badge status={r.status} />
+                  <span className="basis-full pl-12 text-xs text-gray-500 sm:basis-auto sm:pl-0">
+                    {r.status === "adopted"
+                      ? `支出 #${r.linked_expense_id} として登録済み`
+                      : "集計に含めない（記録だけ残す）"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
