@@ -26,8 +26,11 @@ die() { echo "" >&2; echo "✗ $1" >&2; exit 1; }
 step() { echo ""; echo "── $1"; }
 
 [ -n "$PKG" ] || die "移行パッケージを指定してください:
-  ./ops/setup-new-machine.sh ~/Downloads/migration_20260915_175703.tar.gz"
-[ -f "$PKG" ] || die "ファイルが見つかりません: $PKG"
+  ./ops/setup-new-machine.sh ~/Desktop/家計アプリ移行
+  ./ops/setup-new-machine.sh ~/Downloads/migration_20260915_175703.tar.gz
+
+フォルダでも tar.gz でも構いません。"
+[ -e "$PKG" ] || die "見つかりません: $PKG"
 
 # ---------------------------------------------------------------
 step "1/7 必要なツールが揃っているか"
@@ -49,11 +52,20 @@ echo "  ✓ podman / podman-compose / uv / node"
 # ---------------------------------------------------------------
 step "2/7 移行パッケージを展開"
 # ---------------------------------------------------------------
-WORK=$(mktemp -d)
-trap 'rm -rf "$WORK"' EXIT
-tar -xzf "$PKG" -C "$WORK"
-[ -f "$WORK/household.sql" ] || die "household.sql が入っていません"
-[ -f "$WORK/env.txt" ] || die "env.txt が入っていません"
+# tar.gz なら展開、フォルダならそのまま使う
+if [ -d "$PKG" ]; then
+  WORK="$PKG"
+  CLEANUP=""
+  echo "  フォルダとして読みます: $PKG"
+else
+  WORK=$(mktemp -d)
+  CLEANUP="$WORK"
+  trap '[ -n "$CLEANUP" ] && rm -rf "$CLEANUP"' EXIT
+  tar -xzf "$PKG" -C "$WORK" || die "展開できませんでした: $PKG"
+fi
+
+[ -f "$WORK/household.sql" ] || die "household.sql が見つかりません（$WORK）"
+[ -f "$WORK/env.txt" ] || die "env.txt が見つかりません（$WORK）"
 echo "  ✓ household.sql / env.txt"
 
 # ---------------------------------------------------------------
