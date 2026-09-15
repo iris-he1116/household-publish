@@ -1,11 +1,12 @@
 /**
  * ホーム画面。
  *
- * ホームは「今月、誰が誰にいくら送るか」を確認する場所に絞る。
- * 支出の追加・検索・編集は /expenses に分け、月次集計との重複をなくす。
+ * ホームはクイック入力と「今月、誰が誰にいくら送るか」の確認に絞る。
+ * 支出の検索・編集は /expenses に分け、月次集計との重複をなくす。
  */
 import { Suspense } from "react";
 
+import { QuickExpenseSection } from "@/features/expenses/QuickExpenseSection";
 import { MonthNav } from "@/features/settlement/MonthNav";
 import { SettlementDetail } from "@/features/settlement/SettlementDetail";
 import { SettlementHistory } from "@/features/settlement/SettlementHistory";
@@ -40,6 +41,10 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="space-y-6">
         <MonthNav yearMonth={yearMonth} />
+
+        <Suspense fallback={<Skeleton label="クイック入力" />}>
+          <QuickExpenseSection />
+        </Suspense>
 
         <Suspense key={yearMonth} fallback={<Skeleton label="精算状況" />}>
           <SettlementDetail yearMonth={yearMonth} />

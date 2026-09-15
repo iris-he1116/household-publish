@@ -6,30 +6,15 @@
  */
 import { Suspense } from "react";
 
-import { QuickExpenseForm } from "@/features/expenses/QuickExpenseForm";
+import { QuickExpenseSection } from "@/features/expenses/QuickExpenseSection";
 import { RecentExpenses } from "@/features/expenses/RecentExpenses";
 import { parseQueryState } from "@/features/expenses/query";
-import { getCategories } from "@/lib/api";
 
 export const metadata = { title: "支出｜家計清算" };
 
 function currentYearMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function today(): string {
-  const now = new Date();
-  return [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
-async function QuickExpenseSection() {
-  const categories = await getCategories();
-  return <QuickExpenseForm categories={categories} today={today()} />;
 }
 
 function SectionSkeleton({ label }: { label: string }) {
