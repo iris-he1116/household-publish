@@ -9,8 +9,9 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { cookies } from "next/headers";
 
-import { ApiError, apiPost, type CsvImportResult, type StagingRow } from "@/lib/api";
+import { ApiError, SESSION_COOKIE, apiPost, type CsvImportResult, type StagingRow } from "@/lib/api";
 
 // ============================================================
 // 共通
@@ -69,12 +70,17 @@ export async function importCsv(
   upstream.append("file", file);
 
   try {
+    // ファイル送信なので lib/api.ts の JSON 用ラッパは使えない。
+    // Cookie の転送だけ同じことをする。
+    const jar = await cookies();
+    const session = jar.get(SESSION_COOKIE)?.value;
+
     const res = await fetch(
       `${process.env.API_BASE_URL ?? "http://127.0.0.1:8000"}/api/paypay-import/csv`,
       {
         method: "POST",
         // Content-Type は指定しない。FormData を渡すと境界文字列付きで自動設定される。
-        headers: { "X-User-Id": process.env.API_USER_ID ?? "1" },
+        headers: session ? { Cookie: `${SESSION_COOKIE}=${session}` } : {},
         body: upstream,
         cache: "no-store",
       },

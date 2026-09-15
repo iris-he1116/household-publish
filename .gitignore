@@ -27,3 +27,6 @@ out/
 
 # DB バックアップ（実データを含むためコミットしない）
 backups/
+
+# 移行用パッケージ（DB とパスワード・JWT 鍵を含む）
+migration_*.tar.gz

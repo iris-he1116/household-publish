@@ -1,13 +1,17 @@
 """Category API のルーター。"""
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.api.deps import CurrentUserDep, SessionDep
+from app.api.deps import CurrentUserDep, SessionDep, get_current_user
 from app.api.schemas.category import CategoryCreate, CategoryRead, CategoryUpdate
 from app.db.queries import category as q
 from app.services import category as svc
 
 
-router = APIRouter(prefix="/api/categories", tags=["categories"])
+router = APIRouter(
+    prefix="/api/categories", tags=["categories"],
+    # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.get("/", response_model=list[CategoryRead])

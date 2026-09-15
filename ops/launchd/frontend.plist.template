@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  家計清算アプリの frontend を、Mac にログインしたら自動で起動する。
+
+  ★ これはテンプレート。__REPO__ は install-services.sh が
+    実際のパスに置き換えて ~/Library/LaunchAgents/ に置く。
+    直接編集しても反映されない。
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.household.frontend</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/ops/start-frontend.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__REPO__</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>__REPO__/ops/logs/frontend.log</string>
+    <key>StandardErrorPath</key>
+    <string>__REPO__/ops/logs/frontend.error.log</string>
+</dict>
+</plist>

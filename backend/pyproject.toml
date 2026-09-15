@@ -10,19 +10,17 @@ dependencies = [
     "sqlalchemy>=2.0",
     "alembic>=1.13",
     "psycopg[binary]>=3.2",   # PostgreSQL ドライバ（バイナリ配布で楽）
-
     # 設定ファイル読み込み
     "pydantic>=2.9",
     "pydantic-settings>=2.5",  # .env の読み込み
-
     # ハッシュ化（seed のパスワードで使う）
     "bcrypt>=4.2",
-
     # Phase 3 追加: バックエンド API + 構造化ログ
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "structlog>=24.4",
     "python-multipart>=0.0.20",  # ファイルアップロード（PayPay CSV）用
+    "pyjwt>=2.10",
 ]
 
 [project.optional-dependencies]

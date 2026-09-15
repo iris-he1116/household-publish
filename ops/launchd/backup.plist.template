@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DB のバックアップを毎日 3:00 に取る。
+
+  ★ これはテンプレート。__REPO__ は install-services.sh が置き換える。
+
+  Mac が寝ていた場合は、起きた直後に1回動く
+  （launchd が StartCalendarInterval の取りこぼしを補う）。
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.household.backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/ops/backup-db.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__REPO__</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>__REPO__/ops/logs/backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>__REPO__/ops/logs/backup.error.log</string>
+</dict>
+</plist>

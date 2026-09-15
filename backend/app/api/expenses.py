@@ -1,7 +1,7 @@
 """Expense API のルーター。"""
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.deps import CurrentUserDep, SessionDep
+from app.api.deps import CurrentUserDep, SessionDep, get_current_user
 from app.api.schemas.expense import (
     ExpenseCreate,
     ExpenseListResponse,
@@ -12,7 +12,11 @@ from app.db.queries import expense as q
 from app.services import expense as svc
 
 
-router = APIRouter(prefix="/api/expenses", tags=["expenses"])
+router = APIRouter(
+    prefix="/api/expenses", tags=["expenses"],
+    # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.get("/", response_model=ExpenseListResponse)

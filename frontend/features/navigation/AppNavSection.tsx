@@ -9,19 +9,21 @@
  * 取得に失敗してもナビは出したいので、エラーは握って 0 件として扱う
  * （バックエンドが落ちていても画面遷移はできるべき）。
  */
-import { getStagingRows } from "@/lib/api";
+import { getMe, getStagingRows } from "@/lib/api";
 
 import { AppNav } from "./AppNav";
 
 export async function AppNavSection() {
-  let pendingCount = 0;
-  try {
-    const rows = await getStagingRows("pending");
-    pendingCount = rows.length;
-  } catch {
-    // バッジが出ないだけ。ナビの表示自体は続ける。
-    pendingCount = 0;
-  }
+  // 2つとも失敗してよい（バッジと名前が出ないだけ）。
+  // 未ログインのときは middleware が /login に飛ばすので、ここには来ない。
+  const [pendingCount, userName] = await Promise.all([
+    getStagingRows("pending")
+      .then((rows) => rows.length)
+      .catch(() => 0),
+    getMe()
+      .then((me) => me.name)
+      .catch(() => undefined),
+  ]);
 
-  return <AppNav pendingCount={pendingCount} />;
+  return <AppNav pendingCount={pendingCount} userName={userName} />;
 }

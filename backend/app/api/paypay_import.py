@@ -1,7 +1,7 @@
 """PayPay インポート API のルーター。"""
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.api.deps import CurrentUserDep, SessionDep
+from app.api.deps import CurrentUserDep, SessionDep, get_current_user
 from app.api.schemas.paypay_import import (
     AdoptRequest,
     CsvImportResult,
@@ -12,7 +12,11 @@ from app.db.queries import paypay_import as q
 from app.services import paypay_import as svc
 
 
-router = APIRouter(prefix="/api/paypay-import", tags=["paypay_import"])
+router = APIRouter(
+    prefix="/api/paypay-import", tags=["paypay_import"],
+    # このルーター配下は全て認証必須。ハンドラ個別の指定漏れを防ぐ
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.post("/csv", response_model=CsvImportResult, status_code=status.HTTP_201_CREATED)
