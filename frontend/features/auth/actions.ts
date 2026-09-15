@@ -9,7 +9,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { apiPostRaw, SESSION_COOKIE, UnauthorizedError } from "@/lib/api";
+import { ApiError, apiPostRaw, SESSION_COOKIE, UnauthorizedError } from "@/lib/api";
 
 export type LoginState = { error?: string };
 
@@ -57,6 +57,11 @@ export async function login(
     if (e instanceof UnauthorizedError) {
       // どちらが違うかは言わない（ユーザー名の存在を推測させない）
       return { error: "ユーザー名またはパスワードが違います" };
+    }
+    if (e instanceof ApiError && e.status === 429) {
+      // 「あと何分待てばいいか」はサーバーが文章で返している
+      const msg = typeof e.detail === "string" ? e.detail : null;
+      return { error: msg ?? "試行回数が多すぎます。しばらく待ってからお試しください" };
     }
     return { error: "ログインできませんでした。時間をおいて試してください" };
   }

@@ -14,6 +14,7 @@ from app.api.deps import (
 from app.api.schemas.auth import LoginRequest, MeResponse
 from app.services import auth as auth_svc
 from app.services.events import write_event
+from app.services.login_guard import guard
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -23,14 +24,30 @@ def login(session: SessionDep, response: Response, data: LoginRequest):
     """ユーザー名とパスワードでログインし、Cookie にトークンを載せる。
 
     失敗時は 401。**理由は返さない**（ユーザー名の存在を推測させないため）。
+
+    連続で失敗するとしばらくロックする（429）。
+    Tailscale Funnel で公開すると URL が外から到達できるので、
+    ログイン認証だけが防御になる。総当たりを止められないと守りにならない。
     """
+    # ロック中はパスワードの検証すらしない
+    wait = guard.seconds_until_unlock(data.username)
+    if wait > 0:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"試行回数が多すぎます。{(wait + 59) // 60} 分後にもう一度お試しください",
+            headers={"Retry-After": str(wait)},
+        )
+
     try:
         user = auth_svc.authenticate(session, data.username, data.password)
     except auth_svc.AuthError:
+        guard.record_failure(data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="ユーザー名またはパスワードが違います",
         ) from None
+
+    guard.reset(data.username)
 
     set_session_cookie(response, auth_svc.issue_token(user.id))
     write_event(
