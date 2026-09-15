@@ -57,7 +57,7 @@ export function ExpenseFilters({ state, categories }: Props) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
       {/* 月の前後移動 */}
-      <div className="col-span-2 flex items-center justify-between rounded-md border border-gray-200 sm:col-span-1 sm:justify-start">
+      <div className="col-span-2 grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center gap-2 sm:col-span-1 sm:grid-cols-[2.5rem_9.5rem_2.5rem]">
         <MonthLink
           href={buildHref(state, { yearMonth: shiftMonth(state.yearMonth, -1) })}
           label="前の月"
@@ -71,7 +71,7 @@ export function ExpenseFilters({ state, categories }: Props) {
           onChange={(event) => {
             if (event.target.value) go({ yearMonth: event.target.value });
           }}
-          className="min-w-0 flex-1 border-x border-gray-200 bg-white px-2 py-1.5 text-center text-sm font-medium tabular-nums text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-400 sm:w-36 sm:flex-none"
+          className="min-w-0 w-full cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-center text-sm font-bold tabular-nums text-gray-900 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <MonthLink
           href={buildHref(state, { yearMonth: shiftMonth(state.yearMonth, 1) })}
@@ -164,7 +164,7 @@ function MonthLink({
       href={href}
       scroll={false}
       aria-label={label}
-      className="px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+      className="flex size-10 items-center justify-center rounded-md border border-gray-200 bg-white text-sm text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900"
     >
       {children}
     </Link>

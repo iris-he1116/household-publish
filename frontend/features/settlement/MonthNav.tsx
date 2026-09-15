@@ -39,18 +39,18 @@ export function MonthNav({ yearMonth }: { yearMonth: string }) {
         <span className="hidden sm:inline">◂ {prev}</span>
       </Link>
       <div className="min-w-0 text-center">
-        <h1 className="whitespace-nowrap text-[15px] font-bold text-gray-900 sm:text-xl">
+        <h1 className="sr-only">
           {year}年{Number(month)}月の精算
         </h1>
-        <label className="mt-1 inline-flex items-center gap-1.5 text-xs text-gray-500">
-          <span>月を選択</span>
+        <label>
+          <span className="sr-only">表示する月を選択</span>
           <input
             type="month"
             value={yearMonth}
             onChange={(event) => {
               if (event.target.value) router.push(`/?ym=${event.target.value}`);
             }}
-            className="min-w-0 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-xs text-gray-700"
+            className="w-full max-w-44 cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-center text-[15px] font-bold tabular-nums text-gray-900 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 sm:text-base"
             aria-label="表示する月を選択"
           />
         </label>
