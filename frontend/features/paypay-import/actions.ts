@@ -132,21 +132,28 @@ export type BatchActionState = RowActionState & {
   processedCount: number;
 };
 
+function readStagingIds(formData: FormData): number[] | null {
+  const rawIds = formData.getAll("staging_id");
+  const ids = rawIds.map(Number);
+  if (
+    ids.length === 0 ||
+    ids.length > 100 ||
+    ids.some((id) => !Number.isInteger(id) || id <= 0) ||
+    new Set(ids).size !== ids.length
+  ) {
+    return null;
+  }
+  return ids;
+}
+
 /** 選択した行をまとめて「個人」として除外する。 */
 export async function excludeRows(
   _prevState: BatchActionState,
   formData: FormData,
 ): Promise<BatchActionState> {
-  const ids = formData
-    .getAll("staging_id")
-    .map(Number)
-    .filter((id) => Number.isInteger(id) && id > 0);
-
-  if (ids.length === 0) {
+  const ids = readStagingIds(formData);
+  if (ids === null) {
     return { ok: false, message: "個人にする行を選んでください。", processedCount: 0 };
-  }
-  if (ids.length > 100 || new Set(ids).size !== ids.length) {
-    return { ok: false, message: "選択した行が不正です。", processedCount: 0 };
   }
 
   try {
@@ -165,58 +172,29 @@ export async function excludeRows(
   }
 }
 
-type SharedItem = {
-  staging_id: number;
-  category_id: number;
-  note: null;
-};
-
-function parseSharedItems(raw: FormDataEntryValue | null): SharedItem[] | null {
-  if (typeof raw !== "string") return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0 || parsed.length > 100) return null;
-
-    const items = parsed.map((item): SharedItem | null => {
-      if (typeof item !== "object" || item === null) return null;
-      const candidate = item as Record<string, unknown>;
-      const stagingId = Number(candidate.staging_id);
-      const categoryId = Number(candidate.category_id);
-      if (
-        !Number.isInteger(stagingId) ||
-        stagingId <= 0 ||
-        !Number.isInteger(categoryId) ||
-        categoryId <= 0
-      ) {
-        return null;
-      }
-      return { staging_id: stagingId, category_id: categoryId, note: null };
-    });
-
-    if (items.some((item) => item === null)) return null;
-    const validItems = items as SharedItem[];
-    if (new Set(validItems.map((item) => item.staging_id)).size !== validItems.length) {
-      return null;
-    }
-    return validItems;
-  } catch {
-    return null;
-  }
-}
-
-/** カテゴリ入力済みの行をまとめて共有支出に登録する。 */
+/** 選択した行を、指定された1カテゴリの共有支出としてまとめて登録する。 */
 export async function adoptRows(
   _prevState: BatchActionState,
   formData: FormData,
 ): Promise<BatchActionState> {
-  const items = parseSharedItems(formData.get("items"));
-  if (items === null) {
+  const ids = readStagingIds(formData);
+  const categoryId = Number(formData.get("category_id"));
+  if (ids === null) {
     return {
       ok: false,
-      message: "共有にするすべての行でカテゴリを選んでください。",
+      message: "共有にする行を選んでください。",
       processedCount: 0,
     };
   }
+  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+    return { ok: false, message: "カテゴリを選んでください。", processedCount: 0 };
+  }
+
+  const items = ids.map((stagingId) => ({
+    staging_id: stagingId,
+    category_id: categoryId,
+    note: null,
+  }));
 
   try {
     const result = await apiPost<BatchActionResult>("/api/paypay-import/batch-adopt", { items });

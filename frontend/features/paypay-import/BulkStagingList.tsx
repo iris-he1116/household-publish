@@ -21,29 +21,18 @@ export function BulkStagingList({
   rows: StagingRow[];
   categories: Category[];
 }) {
-  const [personalCandidates, setPersonalCandidates] = useState<Set<number>>(new Set());
-  const [categoryByRow, setCategoryByRow] = useState<Record<number, number>>({});
-  const [bulkCategoryId, setBulkCategoryId] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [categoryId, setCategoryId] = useState("");
   const [excludeState, excludeAction, excluding] = useActionState(excludeRows, INITIAL_STATE);
   const [adoptState, adoptAction, adopting] = useActionState(adoptRows, INITIAL_STATE);
 
-  const personalRows = rows.filter((row) => personalCandidates.has(row.id));
-  const sharedRows = rows.filter((row) => !personalCandidates.has(row.id));
-  const missingCategoryCount = sharedRows.filter((row) => !categoryByRow[row.id]).length;
-  const allSelected = rows.length > 0 && personalRows.length === rows.length;
-  const personalTotal = personalRows.reduce((sum, row) => sum + row.amount, 0);
-  const sharedTotal = sharedRows.reduce((sum, row) => sum + row.amount, 0);
+  const selectedRows = rows.filter((row) => selectedIds.has(row.id));
+  const selectedTotal = selectedRows.reduce((sum, row) => sum + row.amount, 0);
+  const allSelected = rows.length > 0 && selectedRows.length === rows.length;
   const pending = excluding || adopting;
-  const sharedItemsJson = JSON.stringify(
-    sharedRows.map((row) => ({
-      staging_id: row.id,
-      category_id: categoryByRow[row.id] ?? 0,
-      note: null,
-    })),
-  );
 
-  function togglePersonal(id: number) {
-    setPersonalCandidates((current) => {
+  function toggleRow(id: number) {
+    setSelectedIds((current) => {
       const next = new Set(current);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -51,40 +40,34 @@ export function BulkStagingList({
     });
   }
 
-  function toggleAllPersonal() {
-    setPersonalCandidates(allSelected ? new Set() : new Set(rows.map((row) => row.id)));
+  function toggleAll() {
+    setSelectedIds(allSelected ? new Set() : new Set(rows.map((row) => row.id)));
   }
 
-  function applyBulkCategory() {
-    const categoryId = Number(bulkCategoryId);
-    if (!Number.isInteger(categoryId) || categoryId <= 0) return;
-    setCategoryByRow((current) => {
-      const next = { ...current };
-      for (const row of sharedRows) {
-        if (!next[row.id]) next[row.id] = categoryId;
-      }
-      return next;
-    });
-  }
+  const hiddenSelectedIds = selectedRows.map((row) => (
+    <input key={row.id} type="hidden" name="staging_id" value={row.id} />
+  ));
 
   return (
     <>
       <div className="sticky top-2 z-10 space-y-3 rounded-xl border border-gray-200 bg-white/95 p-4 shadow-sm backdrop-blur">
+        <div>
+          <p className="text-xs font-semibold text-gray-500">処理する明細を選択</p>
+          <p className="mt-1 text-sm text-gray-700">
+            {selectedRows.length} 件・{yen(selectedTotal)} を選択中
+          </p>
+        </div>
+
         <div className="grid gap-3 md:grid-cols-2">
           <form action={excludeAction} className="rounded-lg bg-gray-50 p-3">
-            {personalRows.map((row) => (
-              <input key={row.id} type="hidden" name="staging_id" value={row.id} />
-            ))}
-            <p className="text-xs font-semibold text-gray-500">1. 個人分を選んで確定</p>
-            <p className="mt-1 text-sm text-gray-700">
-              {personalRows.length} 件・{yen(personalTotal)} を選択中
-            </p>
+            {hiddenSelectedIds}
+            <p className="text-xs font-semibold text-gray-600">選択した明細が自分だけの支出なら</p>
             <button
               type="submit"
-              disabled={pending || personalRows.length === 0}
+              disabled={pending || selectedRows.length === 0}
               className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {excluding ? "個人分を確定中…" : `選択した ${personalRows.length} 件を個人にする`}
+              {excluding ? "個人分を確定中…" : `選択した ${selectedRows.length} 件を個人にする`}
             </button>
             {excludeState.message && (
               <p
@@ -97,27 +80,33 @@ export function BulkStagingList({
           </form>
 
           <form action={adoptAction} className="rounded-lg bg-emerald-50 p-3">
-            <input type="hidden" name="items" value={sharedItemsJson} />
-            <p className="text-xs font-semibold text-emerald-700">2. 残りのカテゴリを入れて共有</p>
-            <p className="mt-1 text-sm text-gray-700">
-              共有候補 {sharedRows.length} 件・{yen(sharedTotal)}
-              {missingCategoryCount > 0 && `（カテゴリ未入力 ${missingCategoryCount} 件）`}
-            </p>
+            {hiddenSelectedIds}
+            <label className="flex flex-col gap-1">
+              <span className="text-xs font-semibold text-emerald-700">
+                選択した明細を共有するカテゴリ
+              </span>
+              <select
+                name="category_id"
+                value={categoryId}
+                onChange={(event) => setCategoryId(event.target.value)}
+                disabled={pending}
+                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">カテゴリを選択</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="submit"
-              disabled={
-                pending ||
-                personalRows.length > 0 ||
-                sharedRows.length === 0 ||
-                missingCategoryCount > 0
-              }
+              disabled={pending || selectedRows.length === 0 || categoryId === ""}
               className="mt-2 w-full rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {adopting ? "共有分を登録中…" : `残りの ${sharedRows.length} 件を共有にする`}
+              {adopting ? "共有分を登録中…" : `選択した ${selectedRows.length} 件を共有にする`}
             </button>
-            {personalRows.length > 0 && (
-              <p className="mt-1 text-xs text-amber-700">先に選択中の個人分を確定してください</p>
-            )}
             {adoptState.message && (
               <p
                 aria-live="polite"
@@ -128,78 +117,49 @@ export function BulkStagingList({
             )}
           </form>
         </div>
-
-        <div className="flex flex-wrap items-end gap-2 border-t border-gray-100 pt-3">
-          <label className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">未入力の共有候補に一括設定</span>
-            <select
-              value={bulkCategoryId}
-              onChange={(event) => setBulkCategoryId(event.target.value)}
-              disabled={pending || sharedRows.length === 0}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
-            >
-              <option value="">カテゴリを選択</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            onClick={applyBulkCategory}
-            disabled={pending || bulkCategoryId === "" || missingCategoryCount === 0}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            未入力すべてに適用
-          </button>
-        </div>
-
       </div>
 
       <div className="overflow-hidden rounded-xl border border-gray-200">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 md:grid-cols-[auto_1fr_auto_12rem]">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3">
           <input
             type="checkbox"
             checked={allSelected}
-            onChange={toggleAllPersonal}
+            onChange={toggleAll}
             disabled={pending}
-            aria-label="すべて個人候補にする"
-            className="size-4 accent-gray-900"
+            aria-label="すべて選択"
+            className="size-4 accent-blue-700"
           />
           <button
             type="button"
-            onClick={toggleAllPersonal}
+            onClick={toggleAll}
             disabled={pending}
             className="text-left text-xs font-semibold text-gray-600"
           >
-            {allSelected ? "個人候補をすべて解除" : "すべて個人候補に選択"}
+            {allSelected ? "すべての選択を解除" : "すべて選択"}
           </button>
           <span className="text-right text-xs font-semibold text-gray-500">金額</span>
-          <span className="hidden text-xs font-semibold text-gray-500 md:block">共有カテゴリ</span>
         </div>
 
         <ul className="divide-y divide-gray-100">
           {rows.map((row) => {
-            const isPersonal = personalCandidates.has(row.id);
+            const selected = selectedIds.has(row.id);
             return (
               <li
                 key={row.id}
-                className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 md:grid-cols-[auto_1fr_auto_12rem] ${
-                  isPersonal ? "bg-gray-50" : "bg-white"
+                className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 ${
+                  selected ? "bg-blue-50" : "bg-white"
                 }`}
               >
                 <input
                   type="checkbox"
-                  checked={isPersonal}
-                  onChange={() => togglePersonal(row.id)}
+                  checked={selected}
+                  onChange={() => toggleRow(row.id)}
                   disabled={pending}
-                  aria-label={`${row.merchant_name ?? "店舗名なし"}を個人候補にする`}
-                  className="size-4 accent-gray-900"
+                  aria-label={`${row.merchant_name ?? "店舗名なし"}を選択`}
+                  className="size-4 accent-blue-700"
                 />
-                <div className={isPersonal ? "text-gray-400 line-through" : ""}>
-                  <p className="text-sm font-semibold">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
                     {row.merchant_name ?? "（店舗名なし）"}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-500">
@@ -207,28 +167,9 @@ export function BulkStagingList({
                     <span className="ml-2 text-gray-400">{row.paypay_txn_id}</span>
                   </p>
                 </div>
-                <p className={`text-right text-sm font-bold tabular-nums ${isPersonal ? "text-gray-400" : "text-gray-900"}`}>
+                <p className="text-right text-sm font-bold tabular-nums text-gray-900">
                   {yen(row.amount)}
                 </p>
-                <select
-                  value={categoryByRow[row.id] ?? ""}
-                  onChange={(event) =>
-                    setCategoryByRow((current) => ({
-                      ...current,
-                      [row.id]: Number(event.target.value),
-                    }))
-                  }
-                  disabled={pending || isPersonal}
-                  aria-label={`${row.merchant_name ?? "店舗名なし"}の共有カテゴリ`}
-                  className="col-start-2 col-end-4 rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:bg-gray-100 md:col-start-auto md:col-end-auto"
-                >
-                  <option value="">カテゴリを選択</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
               </li>
             );
           })}

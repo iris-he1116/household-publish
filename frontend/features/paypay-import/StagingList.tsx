@@ -39,8 +39,8 @@ export async function StagingList() {
       ) : (
         <>
           <p className="text-xs text-gray-500">
-            自分だけの分をチェックしてまとめて個人扱いにし、残った行にカテゴリを設定して共有登録します。
-            共有にすると支出として登録され、月次清算の対象になります。
+            処理したい行を選び、まとめて「個人」にするか、カテゴリを指定して「共有」にします。
+            同じカテゴリごとに選択と共有登録を繰り返せます。
           </p>
           <BulkStagingList rows={rows} categories={categories} />
         </>
