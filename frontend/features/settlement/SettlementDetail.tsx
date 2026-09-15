@@ -11,6 +11,7 @@ import Link from "next/link";
 import { getSummary, type SettlementSummary } from "@/lib/api";
 
 import { closeMonth, confirmMonth } from "./actions";
+import { MonthNav } from "./MonthNav";
 import { SettlementActionButton } from "./SettlementActionButton";
 
 const yen = (n: number) => `¥ ${n.toLocaleString("ja-JP")}`;
@@ -91,8 +92,9 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
     <div className="space-y-6">
       {/* 精算に必要な情報と操作を、読む順番どおり1つのブロックにまとめる */}
       <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 px-5 py-4">
-          <h2 className="mr-1 text-base font-bold text-gray-900">今月の精算</h2>
+        <MonthNav yearMonth={yearMonth} />
+
+        <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 px-5 py-3">
           <span
             className={`rounded-full px-3 py-1 text-xs font-medium ${meta.className}`}
           >
@@ -159,10 +161,10 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
           />
         </dl>
 
-        {/* 双方の確認も同じ精算ブロック内の最終ステップとして置く */}
+        {/* 双方の確認も同じ精算ブロック内の次のステップとして置く */}
         <div className="border-t border-gray-100 p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-sm font-semibold text-gray-900">双方の確認</h3>
+            <h2 className="text-sm font-semibold text-gray-900">双方の確認</h2>
             <p className="text-xs text-gray-500">{meta.hint}</p>
           </div>
 
@@ -198,14 +200,13 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
             )}
           </div>
         </div>
-      </section>
 
-      {/* 内訳 */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900">
-            カテゴリ別内訳
-          </h2>
+        {/* 補足の内訳も外枠を増やさず、精算ブロックの最下段に収める */}
+        <div className="grid divide-y divide-gray-100 border-t border-gray-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <section className="p-5">
+            <h2 className="text-sm font-semibold text-gray-900">
+              カテゴリ別内訳
+            </h2>
           {s.categories.length === 0 ? (
             <p className="mt-2 text-sm text-gray-400">—</p>
           ) : (
@@ -237,10 +238,10 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
               })}
             </ul>
           )}
-        </section>
+          </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900">支払い手段</h2>
+          <section className="p-5">
+            <h2 className="text-sm font-semibold text-gray-900">支払い手段</h2>
           {s.payment_methods.length === 0 ? (
             <p className="mt-2 text-sm text-gray-400">—</p>
           ) : (
@@ -260,8 +261,9 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
               ))}
             </ul>
           )}
-        </section>
-      </div>
+          </section>
+        </div>
+      </section>
     </div>
   );
 }

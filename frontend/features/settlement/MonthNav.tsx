@@ -23,12 +23,12 @@ export function MonthNav({ yearMonth }: { yearMonth: string }) {
   const [year, month] = yearMonth.split("-");
 
   const linkClass =
-    "rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50";
+    "rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 sm:px-3 sm:text-sm";
 
   return (
     <nav
       aria-label="表示月を切り替える"
-      className="grid grid-cols-[auto_1fr_auto] items-center gap-3"
+      className="grid grid-cols-[auto_1fr_auto] items-center gap-2 border-b border-gray-100 px-4 py-3 sm:gap-3 sm:px-5 sm:py-4"
     >
       <Link
         href={`/?ym=${prev}`}
@@ -39,10 +39,7 @@ export function MonthNav({ yearMonth }: { yearMonth: string }) {
         <span className="hidden sm:inline">◂ {prev}</span>
       </Link>
       <div className="min-w-0 text-center">
-        <p className="text-xs font-semibold tracking-wide text-blue-600">
-          ホーム
-        </p>
-        <h1 className="truncate text-xl font-bold text-gray-900 sm:text-2xl">
+        <h1 className="truncate text-base font-bold text-gray-900 sm:text-xl">
           {year}年{Number(month)}月の精算
         </h1>
       </div>

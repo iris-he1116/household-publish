@@ -41,7 +41,7 @@ export async function RecentExpenses({ state }: { state: ExpenseQueryState }) {
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-lg font-bold text-gray-900">支出一覧</h2>
+        <h1 className="text-2xl font-bold text-gray-900">支出一覧</h1>
         <p className="text-xs text-gray-500">
           全 {list.total} 件 / 合計 {yen(list.total_amount)}
         </p>

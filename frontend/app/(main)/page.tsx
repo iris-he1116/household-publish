@@ -7,7 +7,6 @@
 import { Suspense } from "react";
 
 import { QuickExpenseSection } from "@/features/expenses/QuickExpenseSection";
-import { MonthNav } from "@/features/settlement/MonthNav";
 import { SettlementDetail } from "@/features/settlement/SettlementDetail";
 import { SettlementHistory } from "@/features/settlement/SettlementHistory";
 
@@ -40,8 +39,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="space-y-6">
-        <MonthNav yearMonth={yearMonth} />
-
         <Suspense fallback={<Skeleton label="クイック入力" />}>
           <QuickExpenseSection />
         </Suspense>
