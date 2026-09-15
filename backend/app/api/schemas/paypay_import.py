@@ -20,9 +20,19 @@ class StagingRowRead(BaseModel):
 
 
 class CsvImportResult(BaseModel):
-    total_rows: int
-    new_rows: int
-    duplicate_rows: int
+    """CSV 取り込みの結果。
+
+    `total_rows` は「支払い」行の数で、CSV の行数とは一致しない。
+    実物の PayPay CSV にはチャージ・ポイント獲得・送金が混ざっており、
+    それらは支出ではないので取り込む前に落としている（`skipped_rows`）。
+    """
+
+    total_rows: int = Field(description="取り込み対象になった行数（支払いのみ）")
+    new_rows: int = Field(description="新規に登録した行数")
+    duplicate_rows: int = Field(description="取引番号が既にあり除外した行数")
+    skipped_rows: int = Field(
+        default=0, description="支出でないため対象外にした行数（チャージ・ポイント・送金など）"
+    )
 
 
 class AdoptRequest(BaseModel):
