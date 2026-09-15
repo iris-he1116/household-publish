@@ -4,6 +4,9 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from app.api.deps import CurrentUserDep, SessionDep, get_current_user
 from app.api.schemas.paypay_import import (
     AdoptRequest,
+    BatchActionResult,
+    BatchAdoptRequest,
+    BatchExcludeRequest,
     CsvImportResult,
     ExcludeRequest,
     StagingRowRead,
@@ -50,6 +53,34 @@ def list_staging(
         imported_by=user.id if only_mine else None,
         status=status,
     )
+
+
+@router.post("/batch-adopt", response_model=BatchActionResult)
+def batch_adopt(
+    session: SessionDep, user: CurrentUserDep, data: BatchAdoptRequest
+):
+    """カテゴリ入力済みの複数行を、まとめて共有支出に登録する。"""
+    try:
+        return svc.adopt_many(
+            session,
+            user,
+            [item.model_dump() for item in data.items],
+        )
+    except ValueError as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/batch-exclude", response_model=BatchActionResult)
+def batch_exclude(
+    session: SessionDep, user: CurrentUserDep, data: BatchExcludeRequest
+):
+    """選択した複数行を、まとめて個人支出として除外する。"""
+    try:
+        return svc.exclude_many(session, user, data.staging_ids, data.reason)
+    except ValueError as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/staging/{staging_id}/adopt", response_model=StagingRowRead)

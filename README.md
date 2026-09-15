@@ -26,11 +26,12 @@
 | :---- | :---- | :---- |
 | Phase 1 | 設計（ドメイン / アーキテクチャ / データモデル / UI モック） | 完了 |
 | Phase 2 | DB 基盤（PostgreSQL コンテナ / SQLAlchemy モデル / Alembic） | 完了 |
-| Phase 3 | バックエンド API（FastAPI 14 パス / 18 オペレーション + 構造化ログ） | 完了（AI 連携は不要と判断して見送り → [DESIGN.md §1.8](DESIGN.md)） |
-| Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | 完了 |
+| Phase 3 | バックエンド API（FastAPI 20 パス / 24 オペレーション + 構造化ログ） | 完了 |
+| Phase 4 | フロントエンド（Next.js 3画面 / API 接続 / Server Actions） | 完了（PayPay 一括判定を含む） |
 | Phase 5 | 認証（JWT）・月末自動締めジョブ・テスト拡充・mypy | 進行中（認証・自動締め・テスト基盤・mypyは完了。ユーザー設定は未着手） |
 | Phase 6 | ログ分析（events → BigQuery） | 未着手 |
 | Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
+| v2 | MCP 経由の PayPay カテゴリ分類提案 | 構想中（確定操作は人間が行う） |
 
 ブラウザで **`http://localhost:3000`** を開くと3画面（ホーム／月次清算／PayPay 取り込み）が使える。
 API 単体を試したいときは Swagger UI（`http://localhost:8000/docs`）。

@@ -42,3 +42,28 @@ class AdoptRequest(BaseModel):
 
 class ExcludeRequest(BaseModel):
     reason: str | None = Field(default=None, max_length=200)
+
+
+class BatchAdoptItem(BaseModel):
+    """一括共有登録する1行。
+
+    将来 AI が分類結果を返すときも、この形（行ID + カテゴリID）を使える。
+    """
+
+    staging_id: int = Field(gt=0)
+    category_id: int = Field(gt=0)
+    note: str | None = Field(default=None, max_length=500)
+
+
+class BatchAdoptRequest(BaseModel):
+    items: list[BatchAdoptItem] = Field(min_length=1, max_length=100)
+
+
+class BatchExcludeRequest(BaseModel):
+    staging_ids: list[int] = Field(min_length=1, max_length=100)
+    reason: str | None = Field(default=None, max_length=200)
+
+
+class BatchActionResult(BaseModel):
+    processed_count: int
+    total_amount: int

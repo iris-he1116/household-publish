@@ -11,7 +11,14 @@
 import { refresh } from "next/cache";
 import { cookies } from "next/headers";
 
-import { ApiError, SESSION_COOKIE, apiPost, type CsvImportResult, type StagingRow } from "@/lib/api";
+import {
+  ApiError,
+  SESSION_COOKIE,
+  apiPost,
+  type BatchActionResult,
+  type CsvImportResult,
+  type StagingRow,
+} from "@/lib/api";
 
 // ============================================================
 // 共通
@@ -120,6 +127,109 @@ export type RowActionState = {
   ok: boolean | null;
   message: string | null;
 };
+
+export type BatchActionState = RowActionState & {
+  processedCount: number;
+};
+
+/** 選択した行をまとめて「個人」として除外する。 */
+export async function excludeRows(
+  _prevState: BatchActionState,
+  formData: FormData,
+): Promise<BatchActionState> {
+  const ids = formData
+    .getAll("staging_id")
+    .map(Number)
+    .filter((id) => Number.isInteger(id) && id > 0);
+
+  if (ids.length === 0) {
+    return { ok: false, message: "個人にする行を選んでください。", processedCount: 0 };
+  }
+  if (ids.length > 100 || new Set(ids).size !== ids.length) {
+    return { ok: false, message: "選択した行が不正です。", processedCount: 0 };
+  }
+
+  try {
+    const result = await apiPost<BatchActionResult>("/api/paypay-import/batch-exclude", {
+      staging_ids: ids,
+      reason: "個人利用（一括判定）",
+    });
+    refresh();
+    return {
+      ok: true,
+      message: `${result.processed_count} 件を個人の支出として除外しました。`,
+      processedCount: result.processed_count,
+    };
+  } catch (error) {
+    return { ok: false, message: toMessage(error, "一括除外"), processedCount: 0 };
+  }
+}
+
+type SharedItem = {
+  staging_id: number;
+  category_id: number;
+  note: null;
+};
+
+function parseSharedItems(raw: FormDataEntryValue | null): SharedItem[] | null {
+  if (typeof raw !== "string") return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0 || parsed.length > 100) return null;
+
+    const items = parsed.map((item): SharedItem | null => {
+      if (typeof item !== "object" || item === null) return null;
+      const candidate = item as Record<string, unknown>;
+      const stagingId = Number(candidate.staging_id);
+      const categoryId = Number(candidate.category_id);
+      if (
+        !Number.isInteger(stagingId) ||
+        stagingId <= 0 ||
+        !Number.isInteger(categoryId) ||
+        categoryId <= 0
+      ) {
+        return null;
+      }
+      return { staging_id: stagingId, category_id: categoryId, note: null };
+    });
+
+    if (items.some((item) => item === null)) return null;
+    const validItems = items as SharedItem[];
+    if (new Set(validItems.map((item) => item.staging_id)).size !== validItems.length) {
+      return null;
+    }
+    return validItems;
+  } catch {
+    return null;
+  }
+}
+
+/** カテゴリ入力済みの行をまとめて共有支出に登録する。 */
+export async function adoptRows(
+  _prevState: BatchActionState,
+  formData: FormData,
+): Promise<BatchActionState> {
+  const items = parseSharedItems(formData.get("items"));
+  if (items === null) {
+    return {
+      ok: false,
+      message: "共有にするすべての行でカテゴリを選んでください。",
+      processedCount: 0,
+    };
+  }
+
+  try {
+    const result = await apiPost<BatchActionResult>("/api/paypay-import/batch-adopt", { items });
+    refresh();
+    return {
+      ok: true,
+      message: `${result.processed_count} 件を共有支出として登録しました。`,
+      processedCount: result.processed_count,
+    };
+  } catch (error) {
+    return { ok: false, message: toMessage(error, "一括登録"), processedCount: 0 };
+  }
+}
 
 /**
  * その行を「共有」として採用し、支出に昇格させる。

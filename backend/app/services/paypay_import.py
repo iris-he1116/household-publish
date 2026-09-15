@@ -213,6 +213,22 @@ def adopt(
     note: str | None,
 ) -> PayPayImportStaging:
     """staging を「共有」として採用し、Expense に昇格させる。"""
+    result = _adopt_core(
+        session, user, staging, category_id=category_id, note=note
+    )
+    session.commit()
+    return result
+
+
+def _adopt_core(
+    session: Session,
+    user: User,
+    staging: PayPayImportStaging,
+    *,
+    category_id: int,
+    note: str | None,
+) -> PayPayImportStaging:
+    """共有登録の本体。呼び出し側がトランザクションを確定する。"""
     ensure_judgeable(
         status=staging.status,
         imported_by=staging.imported_by,
@@ -247,13 +263,24 @@ def adopt(
         entity_id=staging.id,
         payload={"expense_id": expense.id, "amount": staging.amount},
     )
-    session.commit()
     return staging
 
 
 def exclude(
     session: Session, user: User, staging: PayPayImportStaging, reason: str | None
 ) -> PayPayImportStaging:
+    result = _exclude_core(session, user, staging, reason)
+    session.commit()
+    return result
+
+
+def _exclude_core(
+    session: Session,
+    user: User,
+    staging: PayPayImportStaging,
+    reason: str | None,
+) -> PayPayImportStaging:
+    """個人判定の本体。呼び出し側がトランザクションを確定する。"""
     ensure_judgeable(
         status=staging.status,
         imported_by=staging.imported_by,
@@ -271,5 +298,63 @@ def exclude(
         entity_id=staging.id,
         payload={"reason": reason},
     )
-    session.commit()
     return staging
+
+
+def _load_batch(
+    session: Session,
+    staging_ids: list[int],
+) -> dict[int, PayPayImportStaging]:
+    """重複・欠落のない一括対象を読み込む。"""
+    if len(staging_ids) != len(set(staging_ids)):
+        raise ValueError("同じステージング行が重複しています")
+
+    rows = q.get_staging_batch(session, staging_ids)
+    by_id = {row.id: row for row in rows}
+    missing = [staging_id for staging_id in staging_ids if staging_id not in by_id]
+    if missing:
+        raise ValueError(f"ステージング行が見つかりません: {missing}")
+    return by_id
+
+
+def adopt_many(
+    session: Session,
+    user: User,
+    items: list[dict],
+) -> dict[str, int]:
+    """複数行を1トランザクションで共有支出にする。"""
+    by_id = _load_batch(session, [item["staging_id"] for item in items])
+    total_amount = 0
+
+    for item in items:
+        row = by_id[item["staging_id"]]
+        _adopt_core(
+            session,
+            user,
+            row,
+            category_id=item["category_id"],
+            note=item.get("note"),
+        )
+        total_amount += row.amount
+
+    session.commit()
+    return {"processed_count": len(items), "total_amount": total_amount}
+
+
+def exclude_many(
+    session: Session,
+    user: User,
+    staging_ids: list[int],
+    reason: str | None,
+) -> dict[str, int]:
+    """複数行を1トランザクションで個人支出にする。"""
+    by_id = _load_batch(session, staging_ids)
+    total_amount = 0
+
+    for staging_id in staging_ids:
+        row = by_id[staging_id]
+        _exclude_core(session, user, row, reason)
+        total_amount += row.amount
+
+    session.commit()
+    return {"processed_count": len(staging_ids), "total_amount": total_amount}

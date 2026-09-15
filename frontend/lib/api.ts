@@ -208,6 +208,12 @@ export type CsvImportResult = {
   duplicate_rows: number;
 };
 
+/** PayPay の一括判定結果。 */
+export type BatchActionResult = {
+  processed_count: number;
+  total_amount: number;
+};
+
 /** 月次清算の状態レコード（一覧用。集計は含まない）。 */
 export type Settlement = {
   year_month: string;

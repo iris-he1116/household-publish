@@ -8,7 +8,7 @@
  */
 import { getCategories, getStagingRows } from "@/lib/api";
 
-import { StagingCard } from "./StagingCard";
+import { BulkStagingList } from "./BulkStagingList";
 
 export async function StagingList() {
   // 2つの API を並行して呼ぶ（順に await すると直列になる）
@@ -39,14 +39,10 @@ export async function StagingList() {
       ) : (
         <>
           <p className="text-xs text-gray-500">
-            2人で使った分は「共有にする」、自分だけの分は「個人にする」を選びます。
+            自分だけの分をチェックしてまとめて個人扱いにし、残った行にカテゴリを設定して共有登録します。
             共有にすると支出として登録され、月次清算の対象になります。
           </p>
-          <ul className="space-y-3">
-            {rows.map((row) => (
-              <StagingCard key={row.id} row={row} categories={categories} />
-            ))}
-          </ul>
+          <BulkStagingList rows={rows} categories={categories} />
         </>
       )}
     </section>

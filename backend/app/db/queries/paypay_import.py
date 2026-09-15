@@ -26,6 +26,22 @@ def get_staging(session: Session, staging_id: int) -> PayPayImportStaging | None
     return session.get(PayPayImportStaging, staging_id)
 
 
+def get_staging_batch(
+    session: Session, staging_ids: list[int]
+) -> list[PayPayImportStaging]:
+    """一括判定する行をロックして取得する。
+
+    同じ行を別リクエストが同時に判定し、二重登録するのを防ぐ。
+    所有者・状態の検証はサービス層で行う。
+    """
+    stmt = (
+        select(PayPayImportStaging)
+        .where(PayPayImportStaging.id.in_(staging_ids))
+        .with_for_update()
+    )
+    return list(session.execute(stmt).scalars())
+
+
 def bulk_insert_ignore_duplicates(
     session: Session, rows: list[dict]
 ) -> tuple[int, int]:

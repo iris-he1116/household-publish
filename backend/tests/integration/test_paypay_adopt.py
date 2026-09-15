@@ -60,6 +60,24 @@ def staging_row(session: Session, alice: User) -> PayPayImportStaging:
     return row
 
 
+@pytest.fixture
+def second_staging_row(session: Session, alice: User) -> PayPayImportStaging:
+    """一括判定用の2件目。"""
+    row = PayPayImportStaging(
+        imported_by=alice.id,
+        imported_at=datetime(2026, 8, 4, 9, 35),
+        occurred_on=date(2026, 8, 3),
+        amount=2480,
+        merchant_name="スーパーマーケット",
+        paypay_txn_id="PPY-TEST-002",
+        status="pending",
+        raw_row={"取引日": "2026-08-03", "金額": "2480"},
+    )
+    session.add(row)
+    session.commit()
+    return row
+
+
 def _count(session: Session, model) -> int:
     return session.execute(select(func.count(model.id))).scalar_one()
 
@@ -111,6 +129,105 @@ def test_noteを省略すると店舗名がnoteになる(
     result = svc.adopt(session, alice, staging_row, category_id=category.id, note=None)
     expense = session.get(Expense, result.linked_expense_id)
     assert expense.note == "セブンイレブン 渋谷"
+
+
+def test_複数行をまとめて共有登録できる(
+    session: Session,
+    alice: User,
+    category: Category,
+    staging_row: PayPayImportStaging,
+    second_staging_row: PayPayImportStaging,
+):
+    result = svc.adopt_many(
+        session,
+        alice,
+        [
+            {
+                "staging_id": staging_row.id,
+                "category_id": category.id,
+                "note": None,
+            },
+            {
+                "staging_id": second_staging_row.id,
+                "category_id": category.id,
+                "note": None,
+            },
+        ],
+    )
+
+    assert result == {"processed_count": 2, "total_amount": 3660}
+    assert _count(session, Expense) == 2
+    session.refresh(staging_row)
+    session.refresh(second_staging_row)
+    assert staging_row.status == "adopted"
+    assert second_staging_row.status == "adopted"
+
+
+def test_複数行をまとめて個人扱いにできる(
+    session: Session,
+    alice: User,
+    staging_row: PayPayImportStaging,
+    second_staging_row: PayPayImportStaging,
+):
+    result = svc.exclude_many(
+        session,
+        alice,
+        [staging_row.id, second_staging_row.id],
+        "個人利用（一括判定）",
+    )
+
+    assert result == {"processed_count": 2, "total_amount": 3660}
+    session.refresh(staging_row)
+    session.refresh(second_staging_row)
+    assert staging_row.status == "excluded"
+    assert second_staging_row.status == "excluded"
+    assert _count(session, Expense) == 0
+
+
+def test_一括共有で他人の行が混ざると全件巻き戻る(
+    session: Session,
+    alice: User,
+    hitsuji: User,
+    category: Category,
+    staging_row: PayPayImportStaging,
+):
+    other_row = PayPayImportStaging(
+        imported_by=hitsuji.id,
+        imported_at=datetime(2026, 8, 4, 9, 40),
+        occurred_on=date(2026, 8, 4),
+        amount=500,
+        merchant_name="他人の店舗",
+        paypay_txn_id="PPY-OTHER-001",
+        status="pending",
+        raw_row={},
+    )
+    session.add(other_row)
+    session.commit()
+
+    with pytest.raises(ValueError, match="他人のステージング行"):
+        svc.adopt_many(
+            session,
+            alice,
+            [
+                {
+                    "staging_id": staging_row.id,
+                    "category_id": category.id,
+                    "note": None,
+                },
+                {
+                    "staging_id": other_row.id,
+                    "category_id": category.id,
+                    "note": None,
+                },
+            ],
+        )
+    session.rollback()
+
+    session.refresh(staging_row)
+    session.refresh(other_row)
+    assert staging_row.status == "pending"
+    assert other_row.status == "pending"
+    assert _count(session, Expense) == 0
 
 
 # ============================================================
