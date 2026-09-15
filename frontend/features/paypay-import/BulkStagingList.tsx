@@ -50,7 +50,7 @@ export function BulkStagingList({
 
   return (
     <>
-      <div className="sticky top-2 z-10 space-y-3 rounded-xl border border-gray-200 bg-white/95 p-4 shadow-sm backdrop-blur">
+      <div className="sticky top-2 z-10 space-y-3 rounded-xl border border-gray-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:top-14">
         <div>
           <p className="text-xs font-semibold text-gray-500">処理する明細を選択</p>
           <p className="mt-1 text-sm text-gray-700">

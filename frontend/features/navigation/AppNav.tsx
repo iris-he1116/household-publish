@@ -61,7 +61,7 @@ export function AppNav({
   return (
     <>
       {/* PC: 上部のタブ */}
-      <header className="sticky top-0 z-10 hidden border-b border-gray-800 bg-gray-900 sm:block">
+      <header className="sticky top-0 z-20 hidden border-b border-gray-800 bg-gray-900 sm:block">
         <div className="mx-auto flex max-w-5xl items-center gap-1 px-6">
           <span className="mr-4 py-3 text-sm font-semibold text-white">
             家計清算
@@ -106,7 +106,7 @@ export function AppNav({
       </header>
 
       {/* スマホ: 下部のタブ（親指の届く位置） */}
-      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-gray-200 bg-white sm:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-200 bg-white sm:hidden">
         <div className="flex">
           {ITEMS.map((item) => {
             const active = item.match(pathname);
