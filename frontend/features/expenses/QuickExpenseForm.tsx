@@ -21,6 +21,7 @@ import {
   type SubmittedValues,
 } from "./actions";
 import { PAYERS, PAYMENT_METHODS } from "./constants";
+import { CategoryManagerButton } from "@/features/categories/CategoryManagerButton";
 import { NewCategoryButton } from "@/features/categories/NewCategoryButton";
 // `import type` はコンパイル時に消えるので、
 // server-only な @/lib/api がブラウザ側のバンドルに入ることはない。
@@ -159,6 +160,7 @@ export function QuickExpenseForm({ categories, today }: Props) {
               <NewCategoryButton
                 onCreated={(id) => setPickedCategoryId(String(id))}
               />
+              <CategoryManagerButton categories={categories} />
             </div>
           </Field>
 

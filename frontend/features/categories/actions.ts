@@ -11,7 +11,13 @@
 
 import { refresh } from "next/cache";
 
-import { ApiError, apiGet, apiPost, type Category } from "@/lib/api";
+import {
+  ApiError,
+  apiGet,
+  apiPatch,
+  apiPost,
+  type Category,
+} from "@/lib/api";
 import {
   MESSAGE_BY_TYPE,
   toFieldErrors,
@@ -39,6 +45,11 @@ export type NewCategoryState = {
   /** 追加できたカテゴリの id。呼び出し側でそのまま選択状態にする。 */
   categoryId: number | null;
   /** 失敗理由。入力欄の下に出す。 */
+  message: string | null;
+};
+
+export type CategoryEditState = {
+  ok: boolean;
   message: string | null;
 };
 
@@ -125,4 +136,49 @@ export async function createCategory(
   refresh();
 
   return { ok: true, categoryId: created.id, message: null };
+}
+
+/** 既存カテゴリの名前を変更する。過去の支出にも新しい名前が反映される。 */
+export async function updateCategoryName(
+  categoryId: number,
+  rawName: string,
+): Promise<CategoryEditState> {
+  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+    return { ok: false, message: "編集するカテゴリが見つかりません。" };
+  }
+
+  const name = rawName.trim();
+  if (name === "") {
+    return { ok: false, message: "カテゴリ名を入力してください" };
+  }
+  if (name.length > 50) {
+    return { ok: false, message: "カテゴリ名は50文字以内で入力してください" };
+  }
+
+  const existing = await apiGet<Category[]>("/api/categories/").catch(
+    () => [] as Category[],
+  );
+  if (existing.some((category) => category.id !== categoryId && category.name === name)) {
+    return { ok: false, message: "同じ名前のカテゴリがすでにあります" };
+  }
+
+  try {
+    await apiPatch<Category>(`/api/categories/${categoryId}`, { name });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 422) {
+      const fieldErrors = toFieldErrors(
+        error.detail,
+        isCategoryField,
+        messageFor,
+      );
+      return {
+        ok: false,
+        message: fieldErrors.name ?? "入力内容を確認してください。",
+      };
+    }
+    return { ok: false, message: toGeneralMessage(error, "更新") };
+  }
+
+  refresh();
+  return { ok: true, message: "カテゴリ名を更新しました" };
 }
