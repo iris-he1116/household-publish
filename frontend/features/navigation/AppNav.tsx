@@ -1,5 +1,5 @@
 /**
- * 3画面を行き来するナビゲーション（モックのトップタブ／ボトムタブに対応）。
+ * 3つの役割（精算 / 支出管理 / PayPay 取込）を行き来するナビゲーション。
  *
  * ★ クライアントコンポーネント ★
  *
@@ -35,10 +35,10 @@ const ITEMS: Item[] = [
     match: (p) => p === "/",
   },
   {
-    href: "/settlement",
-    label: "清算",
-    icon: "📊",
-    match: (p) => p.startsWith("/settlement"),
+    href: "/expenses",
+    label: "支出",
+    icon: "🧾",
+    match: (p) => p.startsWith("/expenses"),
   },
   {
     href: "/paypay-import",

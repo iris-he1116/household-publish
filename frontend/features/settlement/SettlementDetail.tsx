@@ -6,6 +6,8 @@
  * 集計の取得も表示も、すべてサーバーで行う。
  * ボタンだけを SettlementActionButton（クライアント）に切り出している。
  */
+import Link from "next/link";
+
 import { getSummary, type SettlementSummary } from "@/lib/api";
 
 import { closeMonth, confirmMonth } from "./actions";
@@ -88,15 +90,11 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
 
   const toAlice = s.transfer_from_b_to_a >= 0;
   const transferAbs = Math.abs(s.transfer_from_b_to_a);
-  const [year, month] = yearMonth.split("-");
 
   return (
     <div className="space-y-6">
-      {/* 見出しと状態 */}
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {year}年{Number(month)}月の清算
-        </h1>
+      {/* 状態と、この月に対する次の操作 */}
+      <div className="flex flex-wrap items-center gap-2">
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${meta.className}`}
         >
@@ -107,15 +105,34 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
             更新あり
           </span>
         )}
-        <span className="text-xs text-gray-500">{s.expense_count} 件</span>
+        <span className="text-xs text-gray-500">共有支出 {s.expense_count}件</span>
+        <div className="ml-auto flex items-center gap-2">
+          <Link
+            href={`/expenses?ym=${yearMonth}`}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
+          >
+            明細を見る
+          </Link>
+          <Link
+            href="/expenses"
+            className="rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          >
+            ＋ 支出を追加
+          </Link>
+        </div>
       </div>
 
       {/* 送金額。この画面で一番知りたい情報なので最初に大きく出す */}
-      <section className="rounded-lg border-2 border-cyan-300 bg-cyan-50 p-6 text-center">
+      <section className="rounded-xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-blue-50 p-6 text-center shadow-sm sm:p-8">
+        <p className="text-xs font-semibold tracking-wide text-cyan-700">
+          現時点の精算額
+        </p>
         {s.total_amount === 0 ? (
-          <p className="text-sm text-cyan-800">この月の支出はまだありません</p>
+          <p className="mt-3 text-lg font-bold text-cyan-900">
+            この月の共有支出はまだありません
+          </p>
         ) : transferAbs === 0 ? (
-          <p className="text-lg font-bold text-cyan-800">
+          <p className="mt-3 text-xl font-bold text-cyan-900">
             ちょうど半分ずつ。送金は不要です
           </p>
         ) : (
@@ -123,7 +140,7 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
             <p className="text-sm text-cyan-800">
               {toAlice ? "ひつじ → ありす" : "ありす → ひつじ"}
             </p>
-            <p className="mt-2 text-4xl font-bold text-cyan-800">
+            <p className="mt-2 text-4xl font-bold tracking-tight text-cyan-900 sm:text-5xl">
               {yen(transferAbs)}
             </p>
             <p className="mt-2 text-xs text-cyan-700">を送金してください</p>
@@ -131,40 +148,28 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
         )}
       </section>
 
-      {/* 集計 */}
-      <section className="rounded-lg border border-gray-200">
-        <dl className="divide-y divide-gray-100">
-          {[
-            ["共有支出の合計", yen(s.total_amount), true],
-            ["1人あたりの負担", yen(s.per_person_share), true],
-            ["ありすの立替", yen(s.user_a_paid), false],
-            ["ひつじの立替", yen(s.user_b_paid), false],
-          ].map(([label, value, strong]) => (
-            <div
-              key={String(label)}
-              className="flex items-baseline justify-between px-4 py-3"
-            >
-              <dt className="text-sm text-gray-600">{label}</dt>
-              <dd
-                className={`tabular-nums ${
-                  strong
-                    ? "text-base font-bold text-gray-900"
-                    : "text-sm text-gray-900"
-                }`}
-              >
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <p className="border-t border-gray-100 px-4 py-2 text-xs text-gray-500">
-          端数の1円は、その月に立替が少なかった側が負担します（DESIGN.md §4）
-        </p>
+      {/* 数字を横に並べ、誰がどれだけ立て替えたか一目で比較できるようにする */}
+      <section className="grid gap-3 sm:grid-cols-3">
+        <SummaryCard
+          label="共有支出の合計"
+          value={yen(s.total_amount)}
+          sub={`${s.expense_count}件・1人あたり ${yen(s.per_person_share)}`}
+        />
+        <SummaryCard
+          label="ありすの立替"
+          value={yen(s.user_a_paid)}
+          accent="blue"
+        />
+        <SummaryCard
+          label="ひつじの立替"
+          value={yen(s.user_b_paid)}
+          accent="violet"
+        />
       </section>
 
       {/* 双方の確認 */}
-      <section className="rounded-lg border border-gray-200 p-4">
-        <div className="flex items-baseline justify-between">
+      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold text-gray-900">双方の確認</h2>
           <p className="text-xs text-gray-500">{meta.hint}</p>
         </div>
@@ -204,7 +209,7 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
 
       {/* 内訳 */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <section className="rounded-lg border border-gray-200 p-4">
+        <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-900">
             カテゴリ別内訳
           </h2>
@@ -241,7 +246,7 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
           )}
         </section>
 
-        <section className="rounded-lg border border-gray-200 p-4">
+        <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-900">支払い手段</h2>
           {s.payment_methods.length === 0 ? (
             <p className="mt-2 text-sm text-gray-400">—</p>
@@ -264,6 +269,34 @@ export async function SettlementDetail({ yearMonth }: { yearMonth: string }) {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  sub,
+  accent = "gray",
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  accent?: "gray" | "blue" | "violet";
+}) {
+  const styles = {
+    gray: "border-gray-200 bg-white",
+    blue: "border-blue-200 bg-blue-50/60",
+    violet: "border-violet-200 bg-violet-50/60",
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 shadow-sm ${styles[accent]}`}>
+      <p className="text-xs font-medium text-gray-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tabular-nums text-gray-900">
+        {value}
+      </p>
+      {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
     </div>
   );
 }

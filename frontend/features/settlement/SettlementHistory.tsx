@@ -44,7 +44,7 @@ export async function SettlementHistory({
               className="flex items-center gap-3 py-2 text-sm"
             >
               <Link
-                href={`/settlement/${s.year_month}`}
+                href={`/?ym=${s.year_month}`}
                 className={`tabular-nums ${
                   isCurrent
                     ? "font-semibold text-gray-900"

@@ -5,7 +5,7 @@
  * フォーム部分だけがクライアント（送信中の表示に pending が要るため）。
  *
  * この画面はナビを出さない。未ログインの状態で
- * 「ホーム / 清算 / PayPay」を見せても遷移できないため。
+ * 「ホーム / 支出 / PayPay」を見せても遷移できないため。
  */
 import { LoginForm } from "@/features/auth/LoginForm";
 

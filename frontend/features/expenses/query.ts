@@ -14,7 +14,7 @@
  * 一覧はサーバーコンポーネントのままでいられるし、
  * 「この条件の画面」をそのままブックマーク・共有・リロードできる。
  *
- *   /?ym=2026-08&category=1&method=cash&payer=2&page=2
+ *   /expenses?ym=2026-08&category=1&method=cash&payer=2&page=2
  */
 import { isPayer, isPaymentMethod } from "./constants";
 
@@ -101,7 +101,8 @@ export function parseQueryState(
  * 今の条件から一部だけ変えた URL を作る。
  *
  * 例) 支払い手段だけ現金にする:
- *   buildHref(state, { paymentMethod: "cash" })  → "/?ym=2026-08&method=cash"
+ *   buildHref(state, { paymentMethod: "cash" })
+ *     → "/expenses?ym=2026-08&method=cash"
  */
 export function buildHref(
   state: ExpenseQueryState,
@@ -125,7 +126,7 @@ export function buildHref(
   // 1ページ目は既定なので載せない（URL を短く保つ）。
   if (next.page > 1) params.set(PARAM.page, String(next.page));
 
-  return `/?${params.toString()}`;
+  return `/expenses?${params.toString()}`;
 }
 
 /** 月以外の絞り込みが掛かっているか。「クリア」を出すかどうかの判定に使う。 */

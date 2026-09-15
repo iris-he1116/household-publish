@@ -5,7 +5,7 @@
  *
  * DESIGN.md の方針「'use client' は葉に付ける。根に付けない」に従い、
  * 'use client' はこのファイルだけに付ける。
- * app/page.tsx やその配下の MonthSummary / RecentExpenses はサーバーのまま。
+ * 支出ページやその配下の RecentExpenses はサーバーのまま。
  *
  * カテゴリは自分では取りに行かず props で受け取る。
  * （API を叩くのはサーバー側の責務。ここはブラウザで動くため `@/lib/api` を実行できない）

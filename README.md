@@ -33,7 +33,8 @@
 | Phase 7 | デプロイ | 未着手（カリキュラム上スコープ外） |
 | v2 | MCP 経由の PayPay カテゴリ分類提案 | 構想中（確定操作は人間が行う） |
 
-ブラウザで **`http://localhost:3000`** を開くと3画面（ホーム／月次清算／PayPay 取り込み）が使える。
+ブラウザで **`http://localhost:3000`** を開くと3画面（ホーム／支出／PayPay 取り込み）が使える。
+ホームは月次清算に集中し、支出の追加・検索・編集は「支出」タブにまとめている。
 API 単体を試したいときは Swagger UI（`http://localhost:8000/docs`）。
 
 ---
@@ -124,7 +125,7 @@ API_BASE_URL=http://127.0.0.1:8000
 
 <http://localhost:3000/login>
 
-3画面（ホーム／月次清算／PayPay 取り込み）が使える。
+3画面（ホーム／支出／PayPay 取り込み）が使える。
 
 API 単体を試したいときは Swagger UI（<http://localhost:8000/docs>）。最初に
 `POST /api/auth/login` でログインすると、以降の認証必須 API を試せる。
@@ -186,7 +187,7 @@ uv run mypy app              # バックエンドの型検査
 | [`PHASE2_PLAN.md`](PHASE2_PLAN.md) | **Phase 2（DB）の構築手順と実行ログ**。Podman / Alembic のハマりどころ付き |
 | [`PHASE3_PLAN.md`](PHASE3_PLAN.md) | **Phase 3（API）の実装手順と実行ログ**。E2E 検証結果とハマりどころ付き |
 | [`PHASE4_PLAN.md`](PHASE4_PLAN.md) | **Phase 4（フロント）の実行計画**。Next.js 16 の作法（Server Actions / キャッシュ）と画面ごとのサーバー・クライアント振り分け |
-| [`mockups/`](mockups/) | UI モック（ワイヤーフレーム）。**3画面 × PC版/スマホ版 の6枚**：ホーム／月次清算／PayPay 取り込み。加えて Phase 5 用のログイン画面 |
+| [`mockups/`](mockups/) | Phase 4 時点のUIモック（ワイヤーフレーム）。現在は情報設計をホーム／支出／PayPay 取り込みへ更新済み。加えて Phase 5 用のログイン画面 |
 | [`slides/`](slides/) | 勉強会（Phase 4 前半）の発表資料。`phase4_frontend.pptx` と全文テキスト版 `phase4_frontend_text.md` |
 
 ---

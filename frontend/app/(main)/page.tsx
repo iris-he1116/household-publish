@@ -1,106 +1,52 @@
 /**
- * ホーム画面（モック① の PC 版に対応）。
+ * ホーム画面。
  *
- * ★ サーバーコンポーネント ★
- * このファイルに 'use client' は無い。付けると配下の MonthSummary /
- * RecentExpenses までクライアントになってしまうので、絶対に付けない。
- * ブラウザに届く JavaScript は入力フォーム・フィルタ・一覧の行（葉）の分だけ。
- *
- * DESIGN.md §1.7 の3画面構成のうち、①ホームを実装したもの。
- *
- * ## 絞り込みは URL のクエリで受け取る
- *
- *   /?ym=2026-08&category=1&method=cash&payer=2&page=2
- *
- * `searchParams` はここ（サーバー）で読み、絞り込んだ結果を組み立てて返す。
- * そのおかげで一覧はサーバーコンポーネントのままでいられる。
- * 詳しい理由は features/expenses/query.ts の冒頭コメントに書いた。
+ * ホームは「今月、誰が誰にいくら送るか」を確認する場所に絞る。
+ * 支出の追加・検索・編集は /expenses に分け、月次集計との重複をなくす。
  */
 import { Suspense } from "react";
 
-import { QuickExpenseForm } from "@/features/expenses/QuickExpenseForm";
-import { RecentExpenses } from "@/features/expenses/RecentExpenses";
-import { parseQueryState } from "@/features/expenses/query";
-import { MonthSummary } from "@/features/settlement/MonthSummary";
-import { getCategories } from "@/lib/api";
+import { MonthNav } from "@/features/settlement/MonthNav";
+import { SettlementDetail } from "@/features/settlement/SettlementDetail";
+import { SettlementHistory } from "@/features/settlement/SettlementHistory";
 
-/** 今日の日付から "YYYY-MM" を作る。 */
+export const metadata = { title: "ホーム｜家計清算" };
+
 function currentYearMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/** 今日の日付を "YYYY-MM-DD" で返す。 */
-function today(): string {
-  const now = new Date();
-  return [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-");
+function validYearMonth(value: string | string[] | undefined): string {
+  const text = Array.isArray(value) ? value[0] : value;
+  return text && /^[12]\d{3}-(0[1-9]|1[0-2])$/.test(text)
+    ? text
+    : currentYearMonth();
 }
 
-/**
- * 入力フォームにカテゴリを渡すためのラッパ（サーバーコンポーネント）。
- *
- * API を叩くのはここまで。フォーム本体はブラウザで動くので、
- * 必要なデータは props で渡し切る。
- * 既定の日付もここで決める（サーバーとブラウザで new Date() の結果がずれて
- * hydration が壊れるのを防ぐため）。
- */
-async function QuickExpenseSection() {
-  const categories = await getCategories();
-  return <QuickExpenseForm categories={categories} today={today()} />;
-}
-
-function SectionSkeleton({ label }: { label: string }) {
+function Skeleton({ label }: { label: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 p-8 text-center text-sm text-gray-400">
+    <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
       {label}を読み込んでいます…
     </div>
   );
 }
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
-  // Next.js 16 では searchParams は Promise。await して初めて中身が読める。
-  // 型は Next.js が生成する PageProps<"/"> をそのまま使う（import 不要のグローバル）。
   const raw = await searchParams;
-
-  // 壊れた値を弾いてから使う。詳細は query.ts の parseQueryState を参照。
-  const state = parseQueryState(raw, currentYearMonth());
+  const yearMonth = validYearMonth(raw.ym);
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-8">
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">家計清算</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          ありす ／ ひつじ の共有支出
-        </p>
-      </header>
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="space-y-6">
+        <MonthNav yearMonth={yearMonth} />
 
-      {/* 唯一の「新規入力」部分。 */}
-      <div className="mb-8">
-        <Suspense fallback={<SectionSkeleton label="入力フォーム" />}>
-          <QuickExpenseSection />
-        </Suspense>
-      </div>
-
-      <div className="space-y-8">
-        {/*
-          Suspense で囲むと、この中の await を待たずに
-          周囲の HTML を先に送れる（ストリーミング）。
-        */}
-        {/*
-          集計も一覧と同じ月を見る。
-          カテゴリ・手段・支払者の絞り込みは一覧だけに掛かる
-          （集計はその月ぜんぶが対象なので、絞り込むと意味が変わってしまう）。
-        */}
-        <Suspense fallback={<SectionSkeleton label="今月の集計" />}>
-          <MonthSummary yearMonth={state.yearMonth} />
+        <Suspense key={yearMonth} fallback={<Skeleton label="精算状況" />}>
+          <SettlementDetail yearMonth={yearMonth} />
         </Suspense>
 
-        <Suspense fallback={<SectionSkeleton label="支出一覧" />}>
-          <RecentExpenses state={state} />
+        <Suspense fallback={<Skeleton label="過去の清算" />}>
+          <SettlementHistory currentYearMonth={yearMonth} />
         </Suspense>
       </div>
     </main>

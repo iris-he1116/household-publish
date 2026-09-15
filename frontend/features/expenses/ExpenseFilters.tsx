@@ -38,7 +38,7 @@ import {
 import type { Category } from "@/lib/api";
 
 type Props = {
-  /** 今の絞り込み条件（app/page.tsx が URL から復元したもの）。 */
+  /** 今の絞り込み条件（支出ページが URL から復元したもの）。 */
   state: ExpenseQueryState;
   /** サーバー側で getCategories() した結果。 */
   categories: Category[];
